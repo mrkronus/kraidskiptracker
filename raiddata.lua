@@ -95,9 +95,3 @@ function GetRaidSkipsQuestData()
 
     return raidSkipsNames, raidSkipsQuestData
 end
-
-function KRaidSkipTracker:GetRaidSkipData()
-
-    return RaidSkipsData
-
-end

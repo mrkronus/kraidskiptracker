@@ -1,19 +1,17 @@
 --
 -- Addon data initialization
 --
-
 local addonName, KRaidSkipTracker = ...
 
 --
 -- LibDB initialization
 --
-
 local LibQTip = LibStub('LibQTip-1.0')
 local LibDataBroker = LibStub("LibDataBroker-1.1")
 
 function tip_OnClick(clickedframe, button)
     if button == "RightButton" then
-        PrintKeysToChat()
+        -- do nothing for now
     end
 end
 
@@ -37,10 +35,7 @@ local function tip_OnEnter(self)
     newLinFont:SetFont("Fonts\\FRIZQT__.TTF", 8, "")
 
     tooltip:SetHeaderFont(headerFont)
-    tooltip:AddHeader("|cFFFFD700K Raid Skips|r")
-
-    tooltip:SetFont(headerSubTextFont)
-    tooltip:AddLine("|cFFF5F5F5Right click to show in chat|r")
+    tooltip:AddHeader("|cFFFFD700K Raid Skip Tracker|r")
     
     tooltip:SetFont(newLinFont)
     tooltip:AddLine("\n")
@@ -100,28 +95,3 @@ local dataobj = LibDataBroker:NewDataObject("K Keyed", {
 local icon = LibStub("LibDBIcon-1.0", true)
 icon:Register("K Keyed", dataobj, KKeyedDB)
 icon:Show("K Keyed")
-
---
--- Slash command registration
---
-SLASH_KEYS1 = "/keys"
-SlashCmdList["KEYS"] = function(msg)
-    PrintKeysToChat()
-end
-
---
--- Slash command worker method
---
-function PrintKeysToChat()
-
-    local raidskips = KRaidSkipTracker:GetRaidSkipData()
-
-    print("\n")
-    for _, raidValues in ipairs(raidskips) do
-        print(raidValues)
-        for _,  v in raidskips[raidValues] do
-            print(format("%s: %s", v.keyName, C_QuestLog.IsQuestFlaggedCompleted(v.questId) and "\124cff00ff00Yes\124r" or "\124cffff0000No\124r"))
-        end
-        print("\n")
-    end
-end
