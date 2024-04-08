@@ -1,21 +1,21 @@
 ﻿## Interface: 100206
 ## Title: KRaidSkipTracker
 ## IconTexture: Interface\Icons\inv_misc_key_15
-## SavedVariables: KRaidSkipTracker
+## SavedVariables: KRaidSkipTrackerDB
 
 ## Notes: KRaidSkipTracker
 ## Author: Katatonik_Kat and Kronus
-## Version: 0.0.4
+## Version: 0.0.11
 ## Dependencies: 
 ## LoadOnDemand: 0
 
 ## X-Curse-Project-ID: 978841
 
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
 #@no-lib-strip@
-libs\LibStub\LibStub.lua
-libs\LibQTip-1.0\LibQTip-1.0.lua
-libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
-libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+embeds.xml
 #@end-no-lib-strip@
 
 # KRaidSkipTracker
