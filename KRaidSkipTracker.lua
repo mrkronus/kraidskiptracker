@@ -66,20 +66,23 @@ local function AddRaidToTooltip(tooltip, raid)
 end
 
 local function AddExpanstionToTooltip(tooltip, xpac)
-    local hasAnyXpacProgress = DoesExpansionHaveAnyProgress(xpac)
-
-    for _, raid in ipairs(xpac.raids) do
-        tooltip:SetFont(SubHeaderTextFont)
-        tooltip:AddLine(format("|cffffff00%s|r", raid.instanceName))
-        AddRaidToTooltip(tooltip, raid)
-        tooltip:SetFont(NewLineFont)
-        tooltip:AddLine("\n")
+    if LibAceAddon:ShouldShowNotStarted() or DoesExpansionHaveAnyProgress(xpac) then
+        for _, raid in ipairs(xpac.raids) do
+            tooltip:SetFont(SubHeaderTextFont)
+            tooltip:AddLine(format("|cffffff00%s|r", raid.instanceName))
+            AddRaidToTooltip(tooltip, raid)
+            tooltip:SetFont(NewLineFont)
+            tooltip:AddLine("\n")
+        end
     end
 end
 
 function KRaidSkipTracker.PopulateTooltip(tooltip)
     tooltip:SetHeaderFont(HeaderFont)
     tooltip:AddHeader("|cFFFFD700K Raid Skip Tracker|r")
+
+    tooltip:SetFont(HeaderSubTextFont)
+    tooltip:AddLine("|cFFF5F5F5Right click for options|r")
 
     tooltip:SetFont(NewLineFont)
     tooltip:AddLine("\n")

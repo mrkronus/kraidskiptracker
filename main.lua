@@ -51,7 +51,7 @@ local LibDataBroker = LibStub("LibDataBroker-1.1")
 
 function tipOnClick(clickedframe, button)
     if button == "RightButton" then
-        -- do nothing for now
+        Settings.OpenToCategory("KRaidSkipTracker")
     end
 end
 
