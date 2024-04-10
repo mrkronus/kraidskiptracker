@@ -15,9 +15,11 @@
 ## X-Embeds: Ace3
 
 #@no-lib-strip@
-embeds.xml
+Embeds.xml
 #@end-no-lib-strip@
 
 # KRaidSkipTracker
-raiddata.lua
-main.lua
+RaidData.lua
+Helpers.lua
+KRaidSkipTracker.lua
+Main.lua
