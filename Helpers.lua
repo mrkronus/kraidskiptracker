@@ -10,15 +10,18 @@ function IsQuestComplete(questId)
 end
 
 function HasStartedAnyQuestObjective(questId)
-    local questObjectives = C_QuestLog.GetQuestObjectives(questId)
+    local objectiveIndex = 1
     local hasStartedAnyObjective = false
+    local questObjectives = C_QuestLog.GetQuestObjectives(questId)
     if questObjectives then
-        for _,objective in ipairs(questObjectives) do
+        for _, objective in ipairs(questObjectives) do
             if objective then
-                if objective.numFulfilled > 0 then
+                local numFulfilled, numRequired = GetQuestObjectivesCompleted(questId, objectiveIndex)
+                if numFulfilled > 0 then
                     hasStartedAnyObjective = true
                     break
                 end
+                objectiveIndex = objectiveIndex + 1
             end
         end
     end
@@ -46,19 +49,24 @@ function GetQuestObjectivesCompleted(questId, objectiveIndex)
     return nil
 end
 
-function DoesExpansionHaveAnyProgress(xpac)
-    for _, raid in ipairs(xpac.raids) do
-        for _, quest in ipairs(raid.quests) do
-            if raid.isStatistic then
-                if IsStatisticComplete(quest.questId) then
-                    return true
-                end
-            else
-                if HasStartedAnyQuestObjective(quest.questId) then
-                    return true
-                end
+function DoesRaidHaveAnyProgress(raid)
+    for _, quest in ipairs(raid.quests) do
+        if raid.isStatistic then
+            if IsStatisticComplete(quest.questId) then
+                return true
+            end
+        else
+            if IsQuestComplete(quest.questId) or HasStartedAnyQuestObjective(quest.questId) then
+                return true
             end
         end
+    end
+    return false
+end
+
+function DoesExpansionHaveAnyProgress(xpac)
+    for _, raid in ipairs(xpac.raids) do
+        DoesRaidHaveAnyProgress(raid)
     end
     return false
 end

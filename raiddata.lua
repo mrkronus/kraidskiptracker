@@ -23,6 +23,8 @@ local RaidOrder =
     2481, -- SL: Sepulcher of the First Ones
 
     2522, -- DF: Vault of the Incarnates
+    2569, -- DF: Aberrus, the Shadowed Crucible
+    0000, -- DF: Amirdrassil, the Dream's Hope
 }
 
 KRaidSkipTracker.questDataByExpansion =
@@ -185,9 +187,27 @@ KRaidSkipTracker.questDataByExpansion =
                 }
             },
 
-            -- Aberrus, the Shadowed Crucible
+            -- DF: Aberrus, the Shadowed Crucible
+            {
+                instanceName = "DF: Aberrus, the Shadowed Crucible", instanceId = 2569, isStatistic = false,
+                quests =
+                {
+                    { questName = "Normal", questId = 76083 },
+                    { questName = "Heroic", questId = 76085 },
+                    { questName = "Mythic", questId = 76086 }
+                }
+            },
 
-            -- Amirdrassil, the Dream's Hope
+            -- DF: Amirdrassil, the Dream's Hope
+            {
+                instanceName = "DF: Amirdrassil, the Dream's Hope", instanceId = 2569, isStatistic = false,
+                quests =
+                {
+                    { questName = "Normal", questId = 78600 },
+                    { questName = "Heroic", questId = 78601 },
+                    { questName = "Mythic", questId = 78602 }
+                }
+            },
         }
     }
 }

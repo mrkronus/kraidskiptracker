@@ -13,28 +13,28 @@ local aceOptions = {
     handler = LibAceAddon,
     type = 'group',
     args = {  
-        showNotStarted = {
+        hideNotStarted = {
             type = "toggle",
-            name = "Show Not Started Skips",
-            desc = "Toggles the display of progression for skips that have not been started yet",
-            get = "ShouldShowNotStarted",
-            set = "ToggleShowNotStarted",
+            name = "Hide not started skips",
+            desc = "Toggles the display of skips that have have no progression",
+            get = "ShouldHideNotStarted",
+            set = "ToggleHideNotStarted",
         },
     },
 }
 
 local aceOptionsDefaults = {
     profile =  {
-        showNotStarted = true,
+        hideNotStarted = false,
     },
 }
 
-function LibAceAddon:ShouldShowNotStarted(info)
-    return self.db.profile.showNotStarted
+function LibAceAddon:ShouldHideNotStarted(info)
+    return self.db.profile.hideNotStarted
 end
 
-function LibAceAddon:ToggleShowNotStarted(info, value)
-    self.db.profile.showNotStarted = value
+function LibAceAddon:ToggleHideNotStarted(info, value)
+    self.db.profile.hideNotStarted = value
 end
 
 function LibAceAddon:OnInitialize()

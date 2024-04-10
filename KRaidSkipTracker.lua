@@ -7,13 +7,13 @@ local HeaderSubTextFont = CreateFont("HeaderSubTextFont")
 HeaderSubTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
 
 local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
-SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 13, "")
+SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 
 local MainTextFont = CreateFont("MainTextFont")
 MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
 
 local NewLineFont = CreateFont("NewLineFont")
-NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 8, "")
+NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 6, "")
 
 local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questName = quest.questName .. ": "
@@ -23,7 +23,7 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
         if IsStatisticComplete(questId) then
             tooltip:AddLine(questName, "\124cff00ff00Acquired\124r")
         else
-            if LibAceAddon:ShouldShowNotStarted() then
+            if not LibAceAddon:ShouldHideNotStarted() then
                 tooltip:AddLine(questName, "\124cFFA9A9A9Incomplete\124r")
             end
         end
@@ -50,7 +50,7 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
 
                 tooltip:AddLine(questName, objectivesString)
             else
-                if LibAceAddon:ShouldShowNotStarted() then
+                if not LibAceAddon:ShouldHideNotStarted() then
                     tooltip:AddLine(questName, format("\124cFFA9A9A9Not Started\124r"))
                 end
             end
@@ -66,14 +66,17 @@ local function AddRaidToTooltip(tooltip, raid)
 end
 
 local function AddExpanstionToTooltip(tooltip, xpac)
-    if LibAceAddon:ShouldShowNotStarted() or DoesExpansionHaveAnyProgress(xpac) then
-        for _, raid in ipairs(xpac.raids) do
+    for _, raid in ipairs(xpac.raids) do
+        if LibAceAddon:ShouldHideNotStarted() and not DoesRaidHaveAnyProgress(raid) then
+            -- continue
+        else
             tooltip:SetFont(SubHeaderTextFont)
             tooltip:AddLine(format("|cffffff00%s|r", raid.instanceName))
             AddRaidToTooltip(tooltip, raid)
             tooltip:SetFont(NewLineFont)
             tooltip:AddLine("\n")
         end
+
     end
 end
 
