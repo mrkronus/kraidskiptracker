@@ -41,6 +41,14 @@ function LibAceAddon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("KRaidSkipTrackerDB", aceOptionsDefaults, true)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("KRaidSkipTracker", aceOptions, {"kraidskiptracker", "krst"})
     self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("KRaidSkipTracker", "KRaidSkipTracker")
+
+    KRaidSkipTracker.Initialize()
+
+    self.db.profile.allPlayersData = KRaidSkipTracker.GetAllPlayersData()
+end
+
+function LibAceAddon:GetDBAllPlayersData()
+    return self.db.profile.allPlayersData
 end
 
 --

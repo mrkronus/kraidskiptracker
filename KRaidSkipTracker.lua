@@ -1,19 +1,17 @@
 local addonName, KRaidSkipTracker = ...
 
+local AllPlayersData = {}
+local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
+
+function KRaidSkipTracker.GetAllPlayersData()
+    return AllPlayersData
+end
+
 local HeaderFont = CreateFont("HeaderFont")
-HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
-
 local HeaderSubTextFont = CreateFont("HeaderSubTextFont")
-HeaderSubTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-
 local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
-SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-
 local MainTextFont = CreateFont("MainTextFont")
-MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-
 local NewLineFont = CreateFont("NewLineFont")
-NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 6, "")
 
 local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questName = quest.questName .. ": "
@@ -87,13 +85,75 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
     tooltip:SetFont(HeaderSubTextFont)
     tooltip:AddLine("|cFFF5F5F5Right click for options|r")
 
-    tooltip:SetFont(NewLineFont)
-    tooltip:AddLine("\n")
-
     tooltip:SetFont(SubHeaderTextFont)
-    tooltip:AddLine("", format("|cffffff00%s|r", UnitName("player")))
+    tooltip:AddLine("", format("|cffffff00%s|r", UnitName("player") .. "\n" .. GetRealmName()))
 
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
         AddExpanstionToTooltip(tooltip, xpac)
     end
+end
+
+function KRaidSkipTracker.InitializeFonts()
+    HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
+    HeaderSubTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+    SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+    MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 6, "")
+end
+
+function KRaidSkipTracker.LoadData()
+    AllPlayersData = LibAceAddon:GetDBAllPlayersData()
+end
+
+function KRaidSkipTracker.UpdateCurrentPlayerData()
+
+    AllPlayersData[GetRealmName()][UnitName("player")] = nil
+    AllPlayersData[GetRealmName()][UnitName("player")] = {}
+
+    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        local xpacsTable = {}
+        xpacsTable[xpac.expansionName] = {}
+        for _, raid in ipairs(xpac.raids) do
+            local raidsTable = {}
+            raidsTable[raid.instanceId] = {};
+            for _, quest in ipairs(raid.quests) do
+                local questsTable = {}
+                local isStarted, isCompleted = false, false
+                local objectives = {}
+
+                if raid.isStatistic then
+                    isCompleted = IsStatisticComplete(quest.questId) and true or false
+                    isStarted = isCompleted
+                else
+                    -- TODO this isn't working to save objectives for some reason
+                    isCompleted = IsQuestComplete(quest.questId) and true or false
+                    isStarted = HasStartedAnyQuestObjective(quest.questId)
+                    if isStarted then
+                        local objectiveIndex = 1
+                        local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
+                        for _, objective in ipairs(questObjectives) do
+                            if objective then
+                                local numFulfilled, numRequired = GetQuestObjectivesCompleted(quest.questId, objectiveIndex)
+                                objectives[objectiveIndex] = { numFulfilled = numFulfilled, numRequired = numRequired }
+                                objectiveIndex = objectiveIndex + 1
+                            end
+                        end
+                    end
+                end
+
+                questsTable[quest.questId] = { isStarted = isStarted, isCompleted = isCompleted, objectives = objectives }
+                table.insert(raidsTable[raid.instanceId], { isStatistic = raid.isStatistic, questsTable })
+            end
+            table.insert(xpacsTable[xpac.expansionName], raidsTable)
+        end
+
+        AllPlayersData[GetRealmName()][UnitName("player")] = { playerName = UnitName("player"), playerRealm = GetRealmName(), shouldShow = true, data = xpacsTable }
+    end
+
+end
+
+function KRaidSkipTracker.Initialize()
+    KRaidSkipTracker.InitializeFonts()
+    KRaidSkipTracker.LoadData()
+    KRaidSkipTracker.UpdateCurrentPlayerData()
 end
