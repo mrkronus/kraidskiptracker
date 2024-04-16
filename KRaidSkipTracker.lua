@@ -105,38 +105,63 @@ function KRaidSkipTracker.LoadData()
     AllPlayersData = LibAceAddon:GetDBAllPlayersData()
 end
 
+function KRaidSkipTracker.GetTotalPlayersCount()
+    local entriesInDataTable = 0
+    for _ in pairs(AllPlayersData) do entriesInDataTable = entriesInDataTable + 1 end
+
+    local currentPlayerIsInTable = false
+    for _, players in ipairs(AllPlayersData) do
+        if players.playerName == UnitName("player") and players.playerRealm == GetRealmName() then
+            currentPlayerIsInTable = true
+            break
+        end
+    end
+
+    if not currentPlayerIsInTable then
+        entriesInDataTable = entriesInDataTable + 1
+    end
+
+    return entriesInDataTable
+end
+
 function KRaidSkipTracker.UpdateCurrentPlayerData()
 
-    AllPlayersData[GetRealmName()][UnitName("player")] = nil
-    AllPlayersData[GetRealmName()][UnitName("player")] = {}
+    local allxpacsTable = {}
 
+    -- For each xpac
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        local xpacsTable = {}
-        xpacsTable[xpac.expansionName] = {}
+        local xpacTable = {}
+        xpacTable[xpac.expansionName] = {}
+
+        -- For each raid in xpac
         for _, raid in ipairs(xpac.raids) do
             local raidsTable = {}
             raidsTable[raid.instanceId] = {};
+
+            -- For each quest in raid
             for _, quest in ipairs(raid.quests) do
                 local questsTable = {}
-                local isStarted, isCompleted = false, false
                 local objectives = {}
+                local isStarted, isCompleted = false, false
 
                 if raid.isStatistic then
+                    -- If it's a statistic
                     isCompleted = IsStatisticComplete(quest.questId) and true or false
                     isStarted = isCompleted
                 else
-                    -- TODO this isn't working to save objectives for some reason
+                    -- Otherwise it's a quest
                     isCompleted = IsQuestComplete(quest.questId) and true or false
-                    isStarted = HasStartedAnyQuestObjective(quest.questId)
-                    if isStarted then
-                        local objectiveIndex = 1
-                        local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
-                        for _, objective in ipairs(questObjectives) do
-                            if objective then
-                                local numFulfilled, numRequired = GetQuestObjectivesCompleted(quest.questId, objectiveIndex)
-                                objectives[objectiveIndex] = { numFulfilled = numFulfilled, numRequired = numRequired }
-                                objectiveIndex = objectiveIndex + 1
-                            end
+                    isStarted = isCompleted
+                    local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
+                    local objectiveIndex = 1
+
+                    -- For each objective of the quest
+                    for _, objective in ipairs(questObjectives) do
+                        if objective then
+                            local numFulfilled, numRequired = GetQuestObjectivesCompleted(quest.questId, objectiveIndex)
+                            objectives[objectiveIndex] = { numFulfilled = numFulfilled, numRequired = numRequired }
+                            objectiveIndex = objectiveIndex + 1
+                            isStarted = isStarted or (numFulfilled > 0)
                         end
                     end
                 end
@@ -144,16 +169,17 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
                 questsTable[quest.questId] = { isStarted = isStarted, isCompleted = isCompleted, objectives = objectives }
                 table.insert(raidsTable[raid.instanceId], { isStatistic = raid.isStatistic, questsTable })
             end
-            table.insert(xpacsTable[xpac.expansionName], raidsTable)
+            table.insert(xpacTable[xpac.expansionName], raidsTable)
         end
-
-        AllPlayersData[GetRealmName()][UnitName("player")] = { playerName = UnitName("player"), playerRealm = GetRealmName(), shouldShow = true, data = xpacsTable }
+        table.insert(allxpacsTable, xpacTable)
     end
+
+    AllPlayersData[CurrentPlayerIdString] = nil
+    AllPlayersData[CurrentPlayerIdString] = { playerName = UnitName("player"), playerRealm = GetRealmName(), shouldShow = true, data = allxpacsTable}
 
 end
 
 function KRaidSkipTracker.Initialize()
     KRaidSkipTracker.InitializeFonts()
     KRaidSkipTracker.LoadData()
-    KRaidSkipTracker.UpdateCurrentPlayerData()
 end

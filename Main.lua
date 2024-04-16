@@ -48,6 +48,9 @@ function LibAceAddon:OnInitialize()
 end
 
 function LibAceAddon:GetDBAllPlayersData()
+    if self.db.profile.allPlayersData == nil then
+        return {}
+    end
     return self.db.profile.allPlayersData
 end
 
@@ -64,7 +67,11 @@ function tipOnClick(clickedframe, button)
 end
 
 local function tipOnEnter(self)
-    local tooltip = LibQTip:Acquire("KKeyedTooltip", 2, "LEFT", "RIGHT")
+    
+    KRaidSkipTracker.UpdateCurrentPlayerData()
+    local playersCount = KRaidSkipTracker.GetTotalPlayersCount()
+
+    local tooltip = LibQTip:Acquire("KKeyedTooltip", playersCount + 1, "LEFT", "RIGHT")
     self.tooltip = tooltip
 
     KRaidSkipTracker.PopulateTooltip(tooltip)
