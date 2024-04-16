@@ -44,6 +44,7 @@ function LibAceAddon:OnInitialize()
 
     KRaidSkipTracker.Initialize()
 
+    self.db.profile.dataVersion = KRaidSkipTracker.GetCurrentDataVersion()
     self.db.profile.allPlayersData = KRaidSkipTracker.GetAllPlayersData()
 end
 
@@ -52,6 +53,13 @@ function LibAceAddon:GetDBAllPlayersData()
         return {}
     end
     return self.db.profile.allPlayersData
+end
+
+function LibAceAddon:GetDBDataVersion()
+    if self.db.profile.dataVersion == nil then
+        return "0.0.0"
+    end
+    return self.db.profile.dataVersion
 end
 
 --

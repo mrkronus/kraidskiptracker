@@ -7,6 +7,10 @@ function KRaidSkipTracker.GetAllPlayersData()
     return AllPlayersData
 end
 
+function KRaidSkipTracker.GetCurrentDataVersion()
+    return GetAddOnMetadata("KRaidSkipTracker", "Version")
+end
+
 local HeaderFont = CreateFont("HeaderFont")
 local HeaderSubTextFont = CreateFont("HeaderSubTextFont")
 local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
