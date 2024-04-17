@@ -3,6 +3,12 @@ local addonName, KRaidSkipTracker = ...
 local AllPlayersData = {}
 local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
 
+local HeaderFont = CreateFont("HeaderFont")
+local HeaderSubTextFont = CreateFont("HeaderSubTextFont")
+local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
+local MainTextFont = CreateFont("MainTextFont")
+local NewLineFont = CreateFont("NewLineFont")
+
 function KRaidSkipTracker.GetAllPlayersData()
     return AllPlayersData
 end
@@ -11,35 +17,42 @@ function KRaidSkipTracker.GetCurrentDataVersion()
     return GetAddOnMetadata("KRaidSkipTracker", "Version")
 end
 
-local HeaderFont = CreateFont("HeaderFont")
-local HeaderSubTextFont = CreateFont("HeaderSubTextFont")
-local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
-local MainTextFont = CreateFont("MainTextFont")
-local NewLineFont = CreateFont("NewLineFont")
+function KRaidSkipTracker.InitializeFonts()
+    HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
+    HeaderSubTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+    SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+    MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 6, "")
+end
 
-local function GetObjectivesString(questId, objectives)
-    local objectivesString = "(none)"
-    if objectives then
-        local objectiveIndex = 1
-        for _, objective in ipairs(objectives) do
-            if objective then
-                local numFulfilled, numRequired = GetQuestObjectivesCompleted(questId, objectiveIndex)
-                if objectiveIndex == 1 then
-                    objectivesString = format("%i/%i", numFulfilled, numRequired)
+function KRaidSkipTracker.LoadData()
+    AllPlayersData = LibAceAddon:GetDBAllPlayersData()
+end
+
+function KRaidSkipTracker.QueryAllQuestData()
+    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        for _, raid in ipairs(xpac.raids) do
+            for _, quest in ipairs(raid.quests) do
+                if raid.isStatistic then
+                    _ = IsStatisticComplete(quest.questId) and true or false
                 else
-                    objectivesString = objectivesString .. format(" | %i/%i", numFulfilled, numRequired)
+                    _ = IsQuestComplete(quest.questId) and true or false
+                    _ = C_QuestLog.GetQuestObjectives(quest.questId)
                 end
-
-                objectiveIndex = objectiveIndex + 1
             end
         end
     end
-    return objectivesString
+end
+
+function KRaidSkipTracker.Initialize()
+    KRaidSkipTracker.InitializeFonts()
+    KRaidSkipTracker.LoadData()
+    KRaidSkipTracker.QueryAllQuestData()
 end
 
 local function AddQuestLineToTooltip(tooltip, raid, quest)
-    local questName = quest.questName .. ": "
     local questId = quest.questId
+    local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
 
     if raid.isStatistic then
         if IsStatisticComplete(questId) then
@@ -55,7 +68,7 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
         else
             if HasStartedAnyQuestObjective(questId) then
                 local questObjectives = C_QuestLog.GetQuestObjectives(questId)
-                tooltip:AddLine(questName, GetObjectivesString(questId, questObjectives))
+                tooltip:AddLine(questName, GetCombinedObjectivesString(questId, questObjectives))
             else
                 if not LibAceAddon:ShouldHideNotStarted() then
                     tooltip:AddLine(questName, format("\124cFFA9A9A9Not Started\124r"))
@@ -72,13 +85,13 @@ local function AddRaidToTooltip(tooltip, raid)
     end
 end
 
-local function AddExpanstionToTooltip(tooltip, xpac)
-    for _, raid in ipairs(xpac.raids) do
+local function AddExpansionToTooltip(tooltip, xpac)
+    for _, raid in ipairs(xpac) do
         if LibAceAddon:ShouldHideNotStarted() and not DoesRaidHaveAnyProgress(raid) then
             -- continue
         else
             tooltip:SetFont(SubHeaderTextFont)
-            tooltip:AddLine(format("|cffffff00%s|r", raid.instanceName))
+            tooltip:AddLine(format("|cffffff00%s|r", GetRaidInstanceNameFromIdInData(raid.instanceId)))
             AddRaidToTooltip(tooltip, raid)
             tooltip:SetFont(NewLineFont)
             tooltip:AddLine("\n")
@@ -97,24 +110,12 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
     tooltip:AddLine("", format("|cffffff00%s|r", UnitName("player") .. "\n" .. GetRealmName()))
 
     local playerData = AllPlayersData[CurrentPlayerIdString]
-    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        AddExpanstionToTooltip(tooltip, xpac)
+    for _, xpac in ipairs(playerData.data) do
+        AddExpansionToTooltip(tooltip, xpac)
     end
 end
 
-function KRaidSkipTracker.InitializeFonts()
-    HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
-    HeaderSubTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-    MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 6, "")
-end
-
-function KRaidSkipTracker.LoadData()
-    AllPlayersData = LibAceAddon:GetDBAllPlayersData()
-end
-
-function KRaidSkipTracker.GetTotalPlayersCount()
+function KRaidSkipTracker.GetTotalPlayersCountInData()
     local entriesInDataTable = 0
     for _ in pairs(AllPlayersData) do entriesInDataTable = entriesInDataTable + 1 end
 
@@ -133,38 +134,19 @@ function KRaidSkipTracker.GetTotalPlayersCount()
     return entriesInDataTable
 end
 
-function KRaidSkipTracker.QueryAllQuestData()
-    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        for _, raid in ipairs(xpac.raids) do
-            for _, quest in ipairs(raid.quests) do
-                if raid.isStatistic then
-                    _ = IsStatisticComplete(quest.questId) and true or false
-                else
-                    _ = IsQuestComplete(quest.questId) and true or false
-                    _ = C_QuestLog.GetQuestObjectives(quest.questId)
-                end
-            end
-        end
-    end
-end
-
 function KRaidSkipTracker.UpdateCurrentPlayerData()
-
     local allxpacsTable = {}
 
     -- For each xpac
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
         local xpacTable = {}
-        xpacTable[xpac.expansionName] = {}
 
         -- For each raid in xpac
         for _, raid in ipairs(xpac.raids) do
             local raidsTable = {}
-            raidsTable[raid.instanceId] = {};
 
             -- For each quest in raid
             for _, quest in ipairs(raid.quests) do
-                local questsTable = {}
                 local objectives = {}
                 local isStarted, isCompleted = false, false
 
@@ -190,27 +172,26 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
                     end
                 end
 
-                questsTable[quest.questId] = { isStarted = isStarted, isCompleted = isCompleted, objectives = objectives }
-                table.insert(raidsTable[raid.instanceId], { isStatistic = raid.isStatistic, questsTable })
+                -- insert the quest data into the raids table
+                table.insert(raidsTable, { isStarted = isStarted, isCompleted = isCompleted, questId = quest.questId, objectives = objectives })
 
                 if LibAceAddon:ShouldShowDebugOutput() then
                     local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
-                    local objectivesString = GetObjectivesString(quest.questId, questObjectives)
+                    local objectivesString = GetCombinedObjectivesString(quest.questId, questObjectives)
                     print(quest.questId .. " | " .. tostring(isStarted) .. " | " .. tostring(isCompleted) .. " | " .. objectivesString)
                 end
             end
-            table.insert(xpacTable[xpac.expansionName], raidsTable)
+
+            -- insert the raid data into the xpacs table
+            table.insert(xpacTable, { isStatistic = raid.isStatistic, instanceId = raid.instanceId, quests = raidsTable })
         end
+
+        -- insert the xpac table into the all xpacs table
         table.insert(allxpacsTable, xpacTable)
     end
 
+    -- assign the all xpacs table to the player data
     AllPlayersData[CurrentPlayerIdString] = nil
     AllPlayersData[CurrentPlayerIdString] = { playerName = UnitName("player"), playerRealm = GetRealmName(), shouldShow = true, data = allxpacsTable}
 
-end
-
-function KRaidSkipTracker.Initialize()
-    KRaidSkipTracker.InitializeFonts()
-    KRaidSkipTracker.LoadData()
-    KRaidSkipTracker.QueryAllQuestData()
 end

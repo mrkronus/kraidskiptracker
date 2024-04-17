@@ -9,10 +9,10 @@ local addonName, KRaidSkipTracker = ...
 LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3.0", "AceEvent-3.0")
 
 local aceOptions = {
-    name = "KRaidSkipTracker",
+    name = "K Raid Skip Tracker",
     handler = LibAceAddon,
     type = 'group',
-    args = {  
+    args = {
         hideNotStarted = {
             type = "toggle",
             name = "Hide not started skips",
@@ -90,11 +90,8 @@ function tipOnClick(clickedframe, button)
 end
 
 local function tipOnEnter(self)
-    
     KRaidSkipTracker.UpdateCurrentPlayerData()
-    local playersCount = KRaidSkipTracker.GetTotalPlayersCount()
-
-    local tooltip = LibQTip:Acquire("KKeyedTooltip", playersCount + 1, "LEFT", "RIGHT")
+    local tooltip = LibQTip:Acquire("KKeyedTooltip", 2, "LEFT", "RIGHT")
     self.tooltip = tooltip
 
     KRaidSkipTracker.PopulateTooltip(tooltip)
