@@ -43,7 +43,7 @@ end
 
 function GetQuestObjectivesCompleted(questId, objectiveIndex)
     if questId ~= nil then
-        local questText, questObjectiveType, isFinished, numFulfilled, numRequired = GetQuestObjectiveInfo(questId, objectiveIndex, false)
+        local _, _, _, numFulfilled, numRequired = GetQuestObjectiveInfo(questId, objectiveIndex, false)
         return numFulfilled, numRequired
     end
     return nil

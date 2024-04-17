@@ -17,6 +17,26 @@ local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
 local MainTextFont = CreateFont("MainTextFont")
 local NewLineFont = CreateFont("NewLineFont")
 
+local function GetObjectivesString(questId, objectives)
+    local objectivesString = "(none)"
+    if objectives then
+        local objectiveIndex = 1
+        for _, objective in ipairs(objectives) do
+            if objective then
+                local numFulfilled, numRequired = GetQuestObjectivesCompleted(questId, objectiveIndex)
+                if objectiveIndex == 1 then
+                    objectivesString = format("%i/%i", numFulfilled, numRequired)
+                else
+                    objectivesString = objectivesString .. format(" | %i/%i", numFulfilled, numRequired)
+                end
+
+                objectiveIndex = objectiveIndex + 1
+            end
+        end
+    end
+    return objectivesString
+end
+
 local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questName = quest.questName .. ": "
     local questId = quest.questId
@@ -34,23 +54,8 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
             tooltip:AddLine(questName, format("\124cff00ff00Acquired\124r"))
         else
             if HasStartedAnyQuestObjective(questId) then
-                local objectiveIndex = 1
-                local objectivesString = "(none)"
                 local questObjectives = C_QuestLog.GetQuestObjectives(questId)
-                for _, objective in ipairs(questObjectives) do
-                    if objective then
-                        local numFulfilled, numRequired = GetQuestObjectivesCompleted(questId, objectiveIndex)
-                        if objectiveIndex == 1 then
-                            objectivesString = format("%i/%i", numFulfilled, numRequired)
-                        else
-                            objectivesString = objectivesString .. format(" | %i/%i", numFulfilled, numRequired)
-                        end
-
-                        objectiveIndex = objectiveIndex + 1
-                    end
-                end
-
-                tooltip:AddLine(questName, objectivesString)
+                tooltip:AddLine(questName, GetObjectivesString(questId, questObjectives))
             else
                 if not LibAceAddon:ShouldHideNotStarted() then
                     tooltip:AddLine(questName, format("\124cFFA9A9A9Not Started\124r"))
@@ -78,7 +83,6 @@ local function AddExpanstionToTooltip(tooltip, xpac)
             tooltip:SetFont(NewLineFont)
             tooltip:AddLine("\n")
         end
-
     end
 end
 
@@ -92,6 +96,7 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
     tooltip:SetFont(SubHeaderTextFont)
     tooltip:AddLine("", format("|cffffff00%s|r", UnitName("player") .. "\n" .. GetRealmName()))
 
+    local playerData = AllPlayersData[CurrentPlayerIdString]
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
         AddExpanstionToTooltip(tooltip, xpac)
     end
@@ -128,6 +133,21 @@ function KRaidSkipTracker.GetTotalPlayersCount()
     return entriesInDataTable
 end
 
+function KRaidSkipTracker.QueryAllQuestData()
+    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        for _, raid in ipairs(xpac.raids) do
+            for _, quest in ipairs(raid.quests) do
+                if raid.isStatistic then
+                    _ = IsStatisticComplete(quest.questId) and true or false
+                else
+                    _ = IsQuestComplete(quest.questId) and true or false
+                    _ = C_QuestLog.GetQuestObjectives(quest.questId)
+                end
+            end
+        end
+    end
+end
+
 function KRaidSkipTracker.UpdateCurrentPlayerData()
 
     local allxpacsTable = {}
@@ -157,9 +177,9 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
                     isCompleted = IsQuestComplete(quest.questId) and true or false
                     isStarted = isCompleted
                     local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
-                    local objectiveIndex = 1
 
                     -- For each objective of the quest
+                    local objectiveIndex = 1
                     for _, objective in ipairs(questObjectives) do
                         if objective then
                             local numFulfilled, numRequired = GetQuestObjectivesCompleted(quest.questId, objectiveIndex)
@@ -172,6 +192,12 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
 
                 questsTable[quest.questId] = { isStarted = isStarted, isCompleted = isCompleted, objectives = objectives }
                 table.insert(raidsTable[raid.instanceId], { isStatistic = raid.isStatistic, questsTable })
+
+                if LibAceAddon:ShouldShowDebugOutput() then
+                    local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
+                    local objectivesString = GetObjectivesString(quest.questId, questObjectives)
+                    print(quest.questId .. " | " .. tostring(isStarted) .. " | " .. tostring(isCompleted) .. " | " .. objectivesString)
+                end
             end
             table.insert(xpacTable[xpac.expansionName], raidsTable)
         end
@@ -186,4 +212,5 @@ end
 function KRaidSkipTracker.Initialize()
     KRaidSkipTracker.InitializeFonts()
     KRaidSkipTracker.LoadData()
+    KRaidSkipTracker.QueryAllQuestData()
 end

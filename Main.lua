@@ -20,6 +20,13 @@ local aceOptions = {
             get = "ShouldHideNotStarted",
             set = "ToggleHideNotStarted",
         },
+        showDebugOutput = {
+            type = "toggle",
+            name = "Show Debug Output",
+            desc = "Toggles the display debugging Text in the chat window. Recommended to leave off.",
+            get = "ShouldShowDebugOutput",
+            set = "ToggleShowDebugOutput",
+        },
     },
 }
 
@@ -35,6 +42,14 @@ end
 
 function LibAceAddon:ToggleHideNotStarted(info, value)
     self.db.profile.hideNotStarted = value
+end
+
+function LibAceAddon:ShouldShowDebugOutput(info)
+    return self.db.profile.showDebugOutput
+end
+
+function LibAceAddon:ToggleShowDebugOutput(info, value)
+    self.db.profile.showDebugOutput = value
 end
 
 function LibAceAddon:OnInitialize()
