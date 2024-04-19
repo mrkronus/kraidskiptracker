@@ -80,7 +80,7 @@ end
 --
 -- LibDB initialization
 --
-local LibQTip = LibStub('LibQTip-1.0')
+LibQTip = LibStub('LibQTip-1.0')
 local LibDataBroker = LibStub("LibDataBroker-1.1")
 
 function tipOnClick(clickedframe, button)
@@ -96,13 +96,13 @@ local function tipOnEnter(self)
 
     KRaidSkipTracker.PopulateTooltip(tooltip)
 
+	tooltip:SetAutoHideDelay(0.01, self)
     tooltip:SmartAnchorTo(self)
     tooltip:Show()
 end
 
 local function tipOnLeave(self)
-    LibQTip:Release(self.tooltip)
-    self.tooltip = nil
+    -- Do nothing
 end
 
 --

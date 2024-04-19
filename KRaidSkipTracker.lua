@@ -4,10 +4,9 @@ local AllPlayersData = {}
 local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
 
 local HeaderFont = CreateFont("HeaderFont")
-local HeaderSubTextFont = CreateFont("HeaderSubTextFont")
-local SubHeaderTextFont = CreateFont("SubHeaderTextFont")
+local FooterTextFont = CreateFont("FooterTextFont")
+local InstanceNameTextFont = CreateFont("InstanceNameTextFont")
 local MainTextFont = CreateFont("MainTextFont")
-local NewLineFont = CreateFont("NewLineFont")
 
 function KRaidSkipTracker.GetAllPlayersData()
     return AllPlayersData
@@ -18,11 +17,10 @@ function KRaidSkipTracker.GetCurrentDataVersion()
 end
 
 function KRaidSkipTracker.InitializeFonts()
-    HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
-    HeaderSubTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    SubHeaderTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+    HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
+    FooterTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+    InstanceNameTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
     MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    NewLineFont:SetFont("Fonts\\FRIZQT__.TTF", 6, "")
 end
 
 function KRaidSkipTracker.LoadData()
@@ -90,29 +88,31 @@ local function AddExpansionToTooltip(tooltip, xpac)
         if LibAceAddon:ShouldHideNotStarted() and not DoesRaidHaveAnyProgress(raid) then
             -- continue
         else
-            tooltip:SetFont(SubHeaderTextFont)
+            tooltip:SetFont(InstanceNameTextFont)
             tooltip:AddLine(format("|cffffff00%s|r", GetRaidInstanceNameFromIdInData(raid.instanceId)))
             AddRaidToTooltip(tooltip, raid)
-            tooltip:SetFont(NewLineFont)
-            tooltip:AddLine("\n")
+            tooltip:AddSeparator(6,0,0,0,0)
         end
     end
 end
 
 function KRaidSkipTracker.PopulateTooltip(tooltip)
-    tooltip:SetHeaderFont(HeaderFont)
-    tooltip:AddHeader("|cFFFFD700K Raid Skip Tracker|r")
+    tooltip:SetFont(HeaderFont)
+    local y, x = tooltip:AddLine()
+    tooltip:SetCell(y, 1, "|cFFFFD700K Raid Skip Tracker|r")
 
-    tooltip:SetFont(HeaderSubTextFont)
-    tooltip:AddLine("|cFFF5F5F5Right click for options|r")
-
-    tooltip:SetFont(SubHeaderTextFont)
-    tooltip:AddLine("", format("|cffffff00%s|r", UnitName("player") .. "\n" .. GetRealmName()))
+    tooltip:SetFont(InstanceNameTextFont)
+    tooltip:SetCell(y, 2, format("|cffffff00%s|r", UnitName("player") .. "\n" .. GetRealmName()))
+    --tooltip:SetCell(y, 3, format("|cffffff00%s|r", "Doom" .. "\n" .. GetRealmName()))
+    tooltip:AddSeparator()
 
     local playerData = AllPlayersData[CurrentPlayerIdString]
     for _, xpac in ipairs(playerData.data) do
         AddExpansionToTooltip(tooltip, xpac)
     end
+
+    tooltip:SetFont(FooterTextFont)
+    tooltip:AddLine("|cFFF5F5F5Right click icon for options|r")
 end
 
 function KRaidSkipTracker.GetTotalPlayersCountInData()
