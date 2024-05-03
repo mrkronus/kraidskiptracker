@@ -16,13 +16,20 @@ local aceOptions = {
         hideNotStarted = {
             type = "toggle",
             name = "Hide not started skips",
-            desc = "Toggles the display of skips that have have no progression",
+            desc = "Toggles the display of skips that have have no progression.",
             get = "ShouldHideNotStarted",
             set = "ToggleHideNotStarted",
         },
+        showOnlyCurrentRealm = {
+            type = "toggle",
+            name = "Current realm only",
+            desc = "Toggles hiding all characters from realms other than " .. GetRealmName() .. ".",
+            get = "ShouldShowOnlyCurrentRealm",
+            set = "ToggleShowOnlyCurrentRealm",
+        },
         showDebugOutput = {
             type = "toggle",
-            name = "Show Debug Output",
+            name = "Show debug output",
             desc = "Toggles the display debugging Text in the chat window. Recommended to leave off.",
             get = "ShouldShowDebugOutput",
             set = "ToggleShowDebugOutput",
@@ -33,6 +40,8 @@ local aceOptions = {
 local aceOptionsDefaults = {
     profile =  {
         hideNotStarted = false,
+        showDebugOutput = false,
+        showOnlyCurrentRealm = true,
     },
 }
 
@@ -50,6 +59,14 @@ end
 
 function LibAceAddon:ToggleShowDebugOutput(info, value)
     self.db.profile.showDebugOutput = value
+end
+
+function LibAceAddon:ShouldShowOnlyCurrentRealm(info)
+    return self.db.profile.showOnlyCurrentRealm
+end
+
+function LibAceAddon:ToggleShowOnlyCurrentRealm(info, value)
+    self.db.profile.showOnlyCurrentRealm = value
 end
 
 function LibAceAddon:OnInitialize()
@@ -91,7 +108,7 @@ end
 
 local function tipOnEnter(self)
     KRaidSkipTracker.UpdateCurrentPlayerData()
-    local tooltip = LibQTip:Acquire("KKeyedTooltip", 2, "LEFT", "RIGHT")
+    local tooltip = LibQTip:Acquire("KKeyedTooltip", 1, "LEFT")
     self.tooltip = tooltip
 
     KRaidSkipTracker.PopulateTooltip(tooltip)

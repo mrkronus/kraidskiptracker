@@ -1,12 +1,26 @@
 local addonName, KRaidSkipTracker = ...
 
 local AllPlayersData = {}
+SortedPlayersData = {}
 local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
 
 local HeaderFont = CreateFont("HeaderFont")
 local FooterTextFont = CreateFont("FooterTextFont")
 local InstanceNameTextFont = CreateFont("InstanceNameTextFont")
 local MainTextFont = CreateFont("MainTextFont")
+
+local function MouseHandler(event, func, button, ...)
+	local name = func
+
+	if _G.type(func) == "function" then
+		func(event, func,button, ...)
+	else
+		func:GetScript("OnClick")(func,button, ...)
+	end
+
+	LibQTip:Release(tooltip)
+	tooltip = nil
+end
 
 function KRaidSkipTracker.GetAllPlayersData()
     return AllPlayersData
@@ -27,7 +41,32 @@ function KRaidSkipTracker.LoadData()
     AllPlayersData = LibAceAddon:GetDBAllPlayersData()
 end
 
-function KRaidSkipTracker.QueryAllQuestData()
+function UpdateSortedPlayersData()
+    SortedPlayersData = {}
+    local insertLocation = 1
+    local playerData = nil
+    for _, player in pairs(AllPlayersData) do
+        if(player.playerName == UnitName("player") and player.playerRealm == GetRealmName()) then
+            playerData = player
+        else
+            if(LibAceAddon:ShouldShowOnlyCurrentRealm() and player.playerRealm ~= GetRealmName()) then
+                -- continue
+            else
+                table.insert(SortedPlayersData, insertLocation, player) 
+                insertLocation = insertLocation + 1
+            end
+        end
+    end
+
+    table.sort(SortedPlayersData, function(a, b) return a.playerName < b.playerName end)
+    table.sort(SortedPlayersData, function(a, b) return a.playerRealm < b.playerRealm end)
+
+    if(playerData ~= nil) then
+       table.insert(SortedPlayersData, 1, playerData)
+    end
+end
+
+function KRaidSkipTracker.PreQueryAllQuestData()
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
         for _, raid in ipairs(xpac.raids) do
             for _, quest in ipairs(raid.quests) do
@@ -45,7 +84,7 @@ end
 function KRaidSkipTracker.Initialize()
     KRaidSkipTracker.InitializeFonts()
     KRaidSkipTracker.LoadData()
-    KRaidSkipTracker.QueryAllQuestData()
+    KRaidSkipTracker.PreQueryAllQuestData()
 end
 
 local function AddQuestLineToTooltip(tooltip, raid, quest)
@@ -86,7 +125,9 @@ end
 local function AddExpansionToTooltip(tooltip, xpac)
     for _, raid in ipairs(xpac) do
         if LibAceAddon:ShouldHideNotStarted() and not DoesRaidHaveAnyProgress(raid) then
-            -- continue
+            if LibAceAddon:ToggleShowDebugOutput() then
+                print("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
+            end
         else
             tooltip:SetFont(InstanceNameTextFont)
             tooltip:AddLine(format("|cffffff00%s|r", GetRaidInstanceNameFromIdInData(raid.instanceId)))
@@ -97,18 +138,20 @@ local function AddExpansionToTooltip(tooltip, xpac)
 end
 
 function KRaidSkipTracker.PopulateTooltip(tooltip)
+    UpdateSortedPlayersData()
+    local playersCount = KRaidSkipTracker.GetTotalPlayersCountInData()
+    for i=1,playersCount do tooltip:AddColumn("RIGHT") end
+
     tooltip:SetFont(HeaderFont)
     local y, x = tooltip:AddLine()
     tooltip:SetCell(y, 1, "|cFFFFD700K Raid Skip Tracker|r")
 
-    tooltip:SetFont(InstanceNameTextFont)
-    tooltip:SetCell(y, 2, format("|cffffff00%s|r", UnitName("player") .. "\n" .. GetRealmName()))
-    --tooltip:SetCell(y, 3, format("|cffffff00%s|r", "Doom" .. "\n" .. GetRealmName()))
+    KRaidSkipTracker.AddPlayersToTooltip(tooltip, y)
     tooltip:AddSeparator()
 
-    local playerData = AllPlayersData[CurrentPlayerIdString]
-    for _, xpac in ipairs(playerData.data) do
-        AddExpansionToTooltip(tooltip, xpac)
+    PlayerData = SortedPlayersData[1]
+    for _, xpac in ipairs(PlayerData.data) do
+       AddExpansionToTooltip(tooltip, xpac)
     end
 
     tooltip:SetFont(FooterTextFont)
@@ -117,21 +160,18 @@ end
 
 function KRaidSkipTracker.GetTotalPlayersCountInData()
     local entriesInDataTable = 0
-    for _ in pairs(AllPlayersData) do entriesInDataTable = entriesInDataTable + 1 end
-
-    local currentPlayerIsInTable = false
-    for _, players in ipairs(AllPlayersData) do
-        if players.playerName == UnitName("player") and players.playerRealm == GetRealmName() then
-            currentPlayerIsInTable = true
-            break
-        end
-    end
-
-    if not currentPlayerIsInTable then
-        entriesInDataTable = entriesInDataTable + 1
-    end
-
+    for _ in pairs(SortedPlayersData) do entriesInDataTable = entriesInDataTable + 1 end
     return entriesInDataTable
+end
+
+function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
+    tooltip:SetFont(InstanceNameTextFont)
+    local cellColumn = 2 -- first column is for the instance name
+    for _, players in pairs(SortedPlayersData) do
+        tooltip:SetCell(cellRow, cellColumn, format("|cffffff00%s|r", players.playerName .. "\n" .. players.playerRealm))
+        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() print("click") end)
+        cellColumn = cellColumn + 1
+    end
 end
 
 function KRaidSkipTracker.UpdateCurrentPlayerData()
