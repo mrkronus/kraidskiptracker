@@ -24,7 +24,7 @@ local RaidOrder =
 
     2522, -- DF: Vault of the Incarnates
     2569, -- DF: Aberrus, the Shadowed Crucible
-    0000, -- DF: Amirdrassil, the Dream's Hope
+    2549, -- DF: Amirdrassil, the Dream's Hope
 }
 
 KRaidSkipTracker.questDataByExpansion =
@@ -200,7 +200,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- DF: Amirdrassil, the Dream's Hope
             {
-                instanceName = "DF: Amirdrassil, the Dream's Hope", instanceId = 2569, isStatistic = false,
+                instanceName = "DF: Amirdrassil, the Dream's Hope", instanceId = 2549, isStatistic = false,
                 quests =
                 {
                     { questName = "Normal", questId = 78600 },

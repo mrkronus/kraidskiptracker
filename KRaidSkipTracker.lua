@@ -1,13 +1,46 @@
 local addonName, KRaidSkipTracker = ...
 
-local AllPlayersData = {}
-SortedPlayersData = {}
+--[[-------------------------------------------------------------------------
+	Variables
+---------------------------------------------------------------------------]]
+
+--[[ Player info]]
 local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
 
+--[[ Fonts ]]
 local HeaderFont = CreateFont("HeaderFont")
 local FooterTextFont = CreateFont("FooterTextFont")
 local InstanceNameTextFont = CreateFont("InstanceNameTextFont")
 local MainTextFont = CreateFont("MainTextFont")
+
+--[[
+    PlayersData
+    - [1] -- Players
+        - shouldShow
+        - playerName
+        - playerRealm
+        - data
+            - [1] -- expansions
+            - [1] -- raids
+                - isStatistic
+                - instanceId
+                - quests
+                - [1] -- quests
+                    - isCompleted
+                    - isStarted
+                    - questId
+                    - objectives
+                    - [1] -- objectives
+                        - numFulFilled
+                        - numRequired
+--]]
+PlayersDataToShow = {}
+AllPlayersData = {}
+
+
+--[[-------------------------------------------------------------------------
+	Methods
+---------------------------------------------------------------------------]]
 
 local function MouseHandler(event, func, button, ...)
 	local name = func
@@ -27,7 +60,7 @@ function KRaidSkipTracker.GetAllPlayersData()
 end
 
 function KRaidSkipTracker.GetCurrentDataVersion()
-    return GetAddOnMetadata("KRaidSkipTracker", "Version")
+    return C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "Version")
 end
 
 function KRaidSkipTracker.InitializeFonts()
@@ -42,7 +75,7 @@ function KRaidSkipTracker.LoadData()
 end
 
 function UpdateSortedPlayersData()
-    SortedPlayersData = {}
+    PlayersDataToShow = {}
     local insertLocation = 1
     local playerData = nil
     for _, player in pairs(AllPlayersData) do
@@ -52,17 +85,21 @@ function UpdateSortedPlayersData()
             if(LibAceAddon:ShouldShowOnlyCurrentRealm() and player.playerRealm ~= GetRealmName()) then
                 -- continue
             else
-                table.insert(SortedPlayersData, insertLocation, player) 
+                table.insert(PlayersDataToShow, insertLocation, player) 
                 insertLocation = insertLocation + 1
             end
         end
     end
 
-    table.sort(SortedPlayersData, function(a, b) return a.playerName < b.playerName end)
-    table.sort(SortedPlayersData, function(a, b) return a.playerRealm < b.playerRealm end)
+    table.sort(PlayersDataToShow, function(a, b)
+        if a.playerRealm ~= b.playerRealm then
+            return a.playerRealm < b.playerRealm
+        end
+        return a.playerName < b.playerName 
+    end)
 
     if(playerData ~= nil) then
-       table.insert(SortedPlayersData, 1, playerData)
+       table.insert(PlayersDataToShow, 1, playerData)
     end
 end
 
@@ -92,25 +129,19 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
 
     if raid.isStatistic then
-        if IsStatisticComplete(questId) then
+        if quest.IsComplete then
             tooltip:AddLine(questName, "\124cff00ff00Acquired\124r")
-        else
-            if not LibAceAddon:ShouldHideNotStarted() then
-                tooltip:AddLine(questName, "\124cFFA9A9A9Incomplete\124r")
-            end
+        elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
+            tooltip:AddLine(questName, "\124cFFA9A9A9Incomplete\124r")
         end
     else
-        if IsQuestComplete(questId) then
+        if quest.IsComplete then
             tooltip:AddLine(questName, format("\124cff00ff00Acquired\124r"))
-        else
-            if HasStartedAnyQuestObjective(questId) then
-                local questObjectives = C_QuestLog.GetQuestObjectives(questId)
-                tooltip:AddLine(questName, GetCombinedObjectivesString(questId, questObjectives))
-            else
-                if not LibAceAddon:ShouldHideNotStarted() then
-                    tooltip:AddLine(questName, format("\124cFFA9A9A9Not Started\124r"))
-                end
-            end
+        elseif quest.isStarted then
+            local questObjectives = C_QuestLog.GetQuestObjectives(questId)
+            tooltip:AddLine(questName, GetCombinedObjectivesString(questId, questObjectives))
+        elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
+            tooltip:AddLine(questName, format("\124cFFA9A9A9Not Started\124r"))
         end
     end
 end
@@ -124,7 +155,7 @@ end
 
 local function AddExpansionToTooltip(tooltip, xpac)
     for _, raid in ipairs(xpac) do
-        if LibAceAddon:ShouldHideNotStarted() and not DoesRaidHaveAnyProgress(raid) then
+        if LibAceAddon:ShouldHideNotStarted() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
             if LibAceAddon:ToggleShowDebugOutput() then
                 print("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
             end
@@ -149,7 +180,7 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
     KRaidSkipTracker.AddPlayersToTooltip(tooltip, y)
     tooltip:AddSeparator()
 
-    PlayerData = SortedPlayersData[1]
+    PlayerData = PlayersDataToShow[1]
     for _, xpac in ipairs(PlayerData.data) do
        AddExpansionToTooltip(tooltip, xpac)
     end
@@ -160,14 +191,14 @@ end
 
 function KRaidSkipTracker.GetTotalPlayersCountInData()
     local entriesInDataTable = 0
-    for _ in pairs(SortedPlayersData) do entriesInDataTable = entriesInDataTable + 1 end
+    for _ in pairs(PlayersDataToShow) do entriesInDataTable = entriesInDataTable + 1 end
     return entriesInDataTable
 end
 
 function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
     tooltip:SetFont(InstanceNameTextFont)
     local cellColumn = 2 -- first column is for the instance name
-    for _, players in pairs(SortedPlayersData) do
+    for _, players in pairs(PlayersDataToShow) do
         tooltip:SetCell(cellRow, cellColumn, format("|cffffff00%s|r", players.playerName .. "\n" .. players.playerRealm))
         tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() print("click") end)
         cellColumn = cellColumn + 1

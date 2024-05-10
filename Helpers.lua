@@ -93,24 +93,49 @@ function HasStartedAnyQuestObjective(questId)
     return hasStartedAnyObjective
 end
 
-function DoesRaidHaveAnyProgress(raid)
-    for _, quest in ipairs(raid.quests) do
-        if raid.isStatistic then
-            if IsStatisticComplete(quest.questId) then
-                return true
-            end
-        else
-            if IsQuestComplete(quest.questId) or HasStartedAnyQuestObjective(quest.questId) then
-                return true
+function DoesRaidDataHaveAnyProgressOnAnyCharacter(raidId)
+    for _, player in ipairs(PlayersDataToShow) do
+        for _, xpac in ipairs(player.data) do
+            for _, raid in ipairs(xpac) do
+                if raid.instanceId == raidId then
+                    if DoesRaidDataHaveAnyProgress(raid) then
+                        if LibAceAddon:ToggleShowDebugOutput() then
+                            print(player.playerName .. " has progress on raid " .. raid.instanceId)
+                        end
+                        return true
+                    end
+                end
             end
         end
     end
     return false
 end
 
-function DoesExpansionHaveAnyProgress(xpac)
-    for _, raid in ipairs(xpac.raids) do
-        DoesRaidHaveAnyProgress(raid)
+function DoesQuestDataHaveAnyProgressOnAnyCharacter(questId)
+    for _, player in ipairs(PlayersDataToShow) do
+        for _, xpac in ipairs(player.data) do
+            for _, raid in ipairs(xpac) do
+                for _, quest in ipairs(raid.quests) do
+                    if quest.questId == questId then
+                        if quest.isComplete or quest.isStarted then
+                            if LibAceAddon:ToggleShowDebugOutput() then
+                                print(player.playerName .. " has progress on quest " .. questId)
+                            end
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
+function DoesRaidDataHaveAnyProgress(raid)
+    for _, quest in ipairs(raid.quests) do
+        if quest.isComplete or quest.isStarted then
+            return true
+        end
     end
     return false
 end
