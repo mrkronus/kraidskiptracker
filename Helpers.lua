@@ -48,9 +48,8 @@ end
 function IsQuestComplete(questId)
     if questId ~= nil then
         return C_QuestLog.IsQuestFlaggedCompleted(questId)
-    else
-        return nil
     end
+    return false
 end
 
 function IsStatisticComplete(statisticId)
@@ -61,9 +60,8 @@ function IsStatisticComplete(statisticId)
         else
             return true
         end
-    else
-        return nil
     end
+    return false
 end
 
 function GetQuestObjectivesCompleted(questId, objectiveIndex)
@@ -117,7 +115,7 @@ function DoesQuestDataHaveAnyProgressOnAnyCharacter(questId)
             for _, raid in ipairs(xpac) do
                 for _, quest in ipairs(raid.quests) do
                     if quest.questId == questId then
-                        if quest.isComplete or quest.isStarted then
+                        if quest.isCompleted or quest.isStarted then
                             if LibAceAddon:ToggleShowDebugOutput() then
                                 print(player.playerName .. " has progress on quest " .. questId)
                             end
@@ -133,7 +131,7 @@ end
 
 function DoesRaidDataHaveAnyProgress(raid)
     for _, quest in ipairs(raid.quests) do
-        if quest.isComplete or quest.isStarted then
+        if quest.isCompleted or quest.isStarted then
             return true
         end
     end
