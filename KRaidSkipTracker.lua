@@ -129,13 +129,13 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
 
     if raid.isStatistic then
-        if quest.IsComplete then
+        if quest.isCompleted then
             tooltip:AddLine(questName, "\124cff00ff00Acquired\124r")
         elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
             tooltip:AddLine(questName, "\124cFFA9A9A9Incomplete\124r")
         end
     else
-        if quest.IsComplete then
+        if quest.isCompleted then
             tooltip:AddLine(questName, format("\124cff00ff00Acquired\124r"))
         elseif quest.isStarted then
             local questObjectives = C_QuestLog.GetQuestObjectives(questId)
@@ -223,11 +223,11 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
 
                 if raid.isStatistic then
                     -- If it's a statistic
-                    isCompleted = IsStatisticComplete(quest.questId) and true or false
+                    isCompleted = IsStatisticComplete(quest.questId)
                     isStarted = isCompleted
                 else
                     -- Otherwise it's a quest
-                    isCompleted = IsQuestComplete(quest.questId) and true or false
+                    isCompleted = IsQuestComplete(quest.questId)
                     isStarted = isCompleted
                     local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
 
