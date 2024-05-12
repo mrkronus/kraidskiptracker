@@ -126,23 +126,12 @@ end
 
 local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questId = quest.questId
-    local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
-
-    if raid.isStatistic then
-        if quest.isCompleted then
-            tooltip:AddLine(questName, "\124cff00ff00Acquired\124r")
-        elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
-            tooltip:AddLine(questName, "\124cFFA9A9A9Incomplete\124r")
-        end
-    else
-        if quest.isCompleted then
-            tooltip:AddLine(questName, format("\124cff00ff00Acquired\124r"))
-        elseif quest.isStarted then
-            local questObjectives = C_QuestLog.GetQuestObjectives(questId)
-            tooltip:AddLine(questName, GetCombinedObjectivesString(questId, questObjectives))
-        elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
-            tooltip:AddLine(questName, format("\124cFFA9A9A9Not Started\124r"))
-        end
+    if DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
+        local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
+        
+        local y, x = tooltip:AddLine()
+        tooltip:SetCell(y, 1, questName)
+        KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, y)
     end
 end
 
@@ -153,7 +142,7 @@ local function AddRaidToTooltip(tooltip, raid)
     end
 end
 
-local function AddExpansionToTooltip(tooltip, xpac)
+local function AddExpansionToTooltip(tooltip, xpac, cellRow)
     for _, raid in ipairs(xpac) do
         if LibAceAddon:ShouldHideNotStarted() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
             if LibAceAddon:ToggleShowDebugOutput() then
@@ -203,6 +192,41 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
         tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() print("click") end)
         cellColumn = cellColumn + 1
     end
+end
+
+function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellRow)
+    tooltip:SetFont(InstanceNameTextFont)
+    local cellColumn = 2 -- first column is for the instance name
+    for _, player in ipairs(PlayersDataToShow) do
+        for _, xpac in ipairs(player.data) do
+            for _, raid in ipairs(xpac) do
+                for _, quest in ipairs(raid.quests) do
+                    if quest.questId == questId then
+                        if raid.isStatistic then
+                            if quest.isCompleted then
+                                tooltip:SetCell(cellRow, cellColumn, "\124cff00ff00Acquired\124r")
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
+                                -- tooltip:SetCell(cellRow, cellColumn, "\124cFFA9A9A9Incomplete\124r")
+                            end
+                        else
+                            if quest.isCompleted then
+                                tooltip:SetCell(cellRow, cellColumn, format("\124cff00ff00Acquired\124r"))
+                            elseif quest.isStarted then
+                                local questObjectives = C_QuestLog.GetQuestObjectives(questId)
+                                tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesString(questId, questObjectives))
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
+                                -- tooltip:SetCell(cellRow, cellColumn, format("\124cFFA9A9A9Not Started\124r"))
+                            end
+                        end                    
+                        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() print("click") end)
+                        cellColumn = cellColumn + 1
+                    end
+                end
+            end
+        end
+    end
+
+    -- tooltip:SetCell(cellRow, cellColumn, format("|cffffff00%s|r", players.playerName .. "\n" .. players.playerRealm))
 end
 
 function KRaidSkipTracker.UpdateCurrentPlayerData()
