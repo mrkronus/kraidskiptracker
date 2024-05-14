@@ -107,6 +107,11 @@ function tipOnClick(clickedframe, button)
 end
 
 local function tipOnEnter(self)
+    if self.tooltip then
+        self.tooltip:Release()
+        self.tooltip = nil
+    end
+    
     KRaidSkipTracker.UpdateCurrentPlayerData()
     local tooltip = LibQTip:Acquire("KKeyedTooltip", 1, "LEFT")
     self.tooltip = tooltip

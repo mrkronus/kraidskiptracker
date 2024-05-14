@@ -37,6 +37,38 @@ local MainTextFont = CreateFont("MainTextFont")
 PlayersDataToShow = {}
 AllPlayersData = {}
 
+--[[-------------------------------------------------------------------------
+	Copy Text Popup
+---------------------------------------------------------------------------]]
+
+local function ShowKRaidSkipTrackerCopyTextPopup(message, text)
+	local popup = StaticPopupDialogs.KRaidSkipTracker_CopyTextPopup;
+	if not popup then
+		popup = {
+            button1 = "Close",
+            hasEditBox = true,
+            editBoxWidth = 300,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+		};
+		StaticPopupDialogs.KRaidSkipTracker_CopyTextPopup = popup;
+	end
+	popup.OnShow = function(self, data)
+        local function HidePopup(self) self:GetParent():Hide() end
+        local function HotkeyHandler(self, key) if IsControlKeyDown() and key == "C" then HidePopup(self) end end
+        self.editBox:SetScript("OnEscapePressed", HidePopup)
+        self.editBox:SetScript("OnEnterPressed", HidePopup)
+        self.editBox:SetScript("OnKeyUp", HotkeyHandler)
+        self.editBox:SetMaxLetters(0)
+        self.editBox:SetText(text)
+        self.editBox:HighlightText()
+    end
+    popup.text = message .. "\n\nuse ctrl-c to copy"
+	StaticPopup_Hide("KRaidSkipTracker_CopyTextPopup");
+	StaticPopup_Show("KRaidSkipTracker_CopyTextPopup");
+end
 
 --[[-------------------------------------------------------------------------
 	Methods
@@ -95,7 +127,7 @@ function UpdateSortedPlayersData()
         if a.playerRealm ~= b.playerRealm then
             return a.playerRealm < b.playerRealm
         end
-        return a.playerName < b.playerName 
+        return a.playerName < b.playerName
     end)
 
     if(playerData ~= nil) then
@@ -128,16 +160,41 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questId = quest.questId
     if DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
         local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
-        
         local y, x = tooltip:AddLine()
         tooltip:SetCell(y, 1, questName)
+        tooltip:SetCellScript(y, 1, "OnMouseUp", MouseHandler, function() ShowKRaidSkipTrackerCopyTextPopup(C_QuestLog.GetTitleForQuestID(questId), "https://www.wowhead.com/quest=" .. questId) end)
+        tooltip:SetCellScript(y, 1, "OnEnter", MouseHandler, function()
+            local hoverTooltip = LibQTip:Acquire("KKeyedHoverTooltip", 1, "LEFT")
+            tooltip.tooltip = hoverTooltip
+
+            if not raid.isStatistic then
+                hoverTooltip:SetFont(MainTextFont)
+                local y, _ = hoverTooltip:AddLine()
+                hoverTooltip:SetCell(y, 1, "|cFFFFD700" .. C_QuestLog.GetTitleForQuestID(questId) .. "|r")
+
+                hoverTooltip:SetFont(FooterTextFont)
+                y, _ = hoverTooltip:AddLine()
+                hoverTooltip:SetCell(y, 1, "Click for Wowhead link")
+
+                hoverTooltip:SetAutoHideDelay(0.01, tooltip)
+                hoverTooltip:SmartAnchorTo(tooltip)
+                hoverTooltip:Show()
+            end
+        end)
+        tooltip:SetCellScript(y, 1, "OnLeave", MouseHandler, function()
+            if tooltip.tooltip then
+                tooltip.tooltip:Release()
+                tooltip.tooltip = nil
+            end
+        end)
+
         KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, y)
     end
 end
 
 local function AddRaidToTooltip(tooltip, raid)
-    tooltip:SetFont(MainTextFont)
     for _, quest in ipairs(raid.quests) do
+        tooltip:SetFont(MainTextFont)
         AddQuestLineToTooltip(tooltip, raid, quest)
     end
 end
@@ -159,6 +216,7 @@ end
 
 function KRaidSkipTracker.PopulateTooltip(tooltip)
     UpdateSortedPlayersData()
+    tooltip:SetCellMarginH(10) -- must be done before any data is added
     local playersCount = KRaidSkipTracker.GetTotalPlayersCountInData()
     for i=1,playersCount do tooltip:AddColumn("RIGHT") end
 
@@ -189,7 +247,7 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
     local cellColumn = 2 -- first column is for the instance name
     for _, players in pairs(PlayersDataToShow) do
         tooltip:SetCell(cellRow, cellColumn, format("|cffffff00%s|r", players.playerName .. "\n" .. players.playerRealm))
-        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() print("click") end)
+        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
         cellColumn = cellColumn + 1
     end
 end
@@ -218,7 +276,7 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                                 -- tooltip:SetCell(cellRow, cellColumn, format("\124cFFA9A9A9Not Started\124r"))
                             end
                         end                    
-                        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() print("click") end)
+                        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
                         cellColumn = cellColumn + 1
                     end
                 end
@@ -252,19 +310,7 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
                 else
                     -- Otherwise it's a quest
                     isCompleted = IsQuestComplete(quest.questId)
-                    isStarted = isCompleted
-                    local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
-
-                    -- For each objective of the quest
-                    local objectiveIndex = 1
-                    for _, objective in ipairs(questObjectives) do
-                        if objective then
-                            local numFulfilled, numRequired = GetQuestObjectivesCompleted(quest.questId, objectiveIndex)
-                            objectives[objectiveIndex] = { numFulfilled = numFulfilled, numRequired = numRequired }
-                            objectiveIndex = objectiveIndex + 1
-                            isStarted = isStarted or (numFulfilled > 0)
-                        end
-                    end
+                    isStarted = isCompleted or IsQuestInLog(quest.questId)
                 end
 
                 -- insert the quest data into the raids table

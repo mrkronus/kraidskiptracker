@@ -45,6 +45,16 @@ function GetCombinedObjectivesString(questId, objectives)
     return objectivesString
 end
 
+function IsQuestInLog(questId)
+    if questId ~= nil then
+        local logIndex = C_QuestLog.GetLogIndexForQuestID(questId)
+        if logIndex ~= nil then
+            return true
+        end
+    end
+    return false
+end
+
 function IsQuestComplete(questId)
     if questId ~= nil then
         return C_QuestLog.IsQuestFlaggedCompleted(questId)

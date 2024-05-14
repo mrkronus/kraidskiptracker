@@ -17,7 +17,7 @@ local RaidOrder =
 
     2217, -- BFA: Ny'alotha, the Waking City
     2070, -- BFA: Battle of Dazar'alor
-    
+
     2296, -- SL: Castle Nathria
     2450, -- SL: Sanctum of Domination
     2481, -- SL: Sepulcher of the First Ones
@@ -122,7 +122,7 @@ KRaidSkipTracker.questDataByExpansion =
                 {
                     { questName = "Normal", questId = 58373 },
                     { questName = "Heroic", questId = 58374 },
-                    { questName = "Mythic", questId = 58375 } 
+                    { questName = "Mythic", questId = 58375 }
                 }
             },
 
