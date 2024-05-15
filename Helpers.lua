@@ -27,7 +27,7 @@ end
 
 function GetCombinedObjectivesString(questId, objectives)
     local objectivesString = "(none)"
-    if objectives then
+    if objectives ~= nil then
         local objectiveIndex = 1
         for _, objective in ipairs(objectives) do
             if objective then
@@ -36,6 +36,25 @@ function GetCombinedObjectivesString(questId, objectives)
                     objectivesString = format("%i/%i", numFulfilled, numRequired)
                 else
                     objectivesString = objectivesString .. format(" | %i/%i", numFulfilled, numRequired)
+                end
+
+                objectiveIndex = objectiveIndex + 1
+            end
+        end
+    end
+    return objectivesString
+end
+
+function GetCombinedObjectivesStringFromData(questId, objectives)
+    local objectivesString = "(none)"
+    if objectives ~= nil then
+        local objectiveIndex = 1
+        for _, objective in ipairs(objectives) do
+            if objective then
+                if objectiveIndex == 1 then
+                    objectivesString = format("%i/%i", objective.numFulfilled, objective.numRequired)
+                else
+                    objectivesString = objectivesString .. format(" | %i/%i", objective.numFulfilled, objective.numRequired)
                 end
 
                 objectiveIndex = objectiveIndex + 1

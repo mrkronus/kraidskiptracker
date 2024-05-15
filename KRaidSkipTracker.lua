@@ -270,8 +270,8 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                             if quest.isCompleted then
                                 tooltip:SetCell(cellRow, cellColumn, format("\124cff00ff00Acquired\124r"))
                             elseif quest.isStarted then
-                                local questObjectives = C_QuestLog.GetQuestObjectives(questId)
-                                tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesString(questId, questObjectives))
+                                local questObjectives = quest.objectives
+                                tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
                             elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
                                 -- tooltip:SetCell(cellRow, cellColumn, format("\124cFFA9A9A9Not Started\124r"))
                             end
@@ -300,7 +300,6 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
 
             -- For each quest in raid
             for _, quest in ipairs(raid.quests) do
-                local objectives = {}
                 local isStarted, isCompleted = false, false
 
                 if raid.isStatistic then
@@ -313,8 +312,10 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
                     isStarted = isCompleted or IsQuestInLog(quest.questId)
                 end
 
+                local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
+
                 -- insert the quest data into the raids table
-                table.insert(raidsTable, { isStarted = isStarted, isCompleted = isCompleted, questId = quest.questId, objectives = objectives })
+                table.insert(raidsTable, { isStarted = isStarted, isCompleted = isCompleted, questId = quest.questId, objectives = questObjectives })
 
                 if LibAceAddon:ShouldShowDebugOutput() then
                     local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
