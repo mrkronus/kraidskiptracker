@@ -120,6 +120,7 @@ local function tipOnEnter(self)
 
 	tooltip:SetAutoHideDelay(0.01, self)
     tooltip:SmartAnchorTo(self)
+	tooltip:UpdateScrolling()
     tooltip:Show()
 end
 

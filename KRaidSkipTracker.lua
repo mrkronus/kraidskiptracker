@@ -246,7 +246,7 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
     tooltip:SetFont(InstanceNameTextFont)
     local cellColumn = 2 -- first column is for the instance name
     for _, players in pairs(PlayersDataToShow) do
-        tooltip:SetCell(cellRow, cellColumn, colorize(players.playerName .. "\n" .. players.playerRealm, KRaidSkipTracker.Colors.SubHeader))
+        tooltip:SetCell(cellRow, cellColumn, colorize(players.playerName .. "\n" .. players.playerRealm, classToColor(players.englishClass)))
         tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
         cellColumn = cellColumn + 1
     end
@@ -330,8 +330,13 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
         table.insert(allxpacsTable, xpacTable)
     end
 
+    local playerClass, englishClass = UnitClass("player")
+    local playerLevel = UnitLevel("player")
+    local overallILevel, _ = GetAverageItemLevel();
+    local lastUpdateTime = GetServerTime()
+
     -- assign the all xpacs table to the player data
     AllPlayersData[CurrentPlayerIdString] = nil
-    AllPlayersData[CurrentPlayerIdString] = { playerName = UnitName("player"), playerRealm = GetRealmName(), shouldShow = true, data = allxpacsTable}
+    AllPlayersData[CurrentPlayerIdString] = { playerName = UnitName("player"), playerRealm = GetRealmName(), playerClass = playerClass, englishClass = englishClass, playerLevel = playerLevel, iLevel = overallILevel, shouldShow = true, lastUpdateServerTime = lastUpdateTime, data = allxpacsTable}
 
 end

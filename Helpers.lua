@@ -54,6 +54,31 @@ function colorize(s, color)
     end
 end
 
+function classToColor(class)
+    local classToColorTable =
+    {
+        ["DEATHKNIGHT"] = KRaidSkipTracker.Colors.DeathKnight,
+        ["DEMONHUNTER"] = KRaidSkipTracker.Colors.DemonHunter,
+        ["DRUID"] = KRaidSkipTracker.Colors.Druid,
+        ["EVOKER"] = KRaidSkipTracker.Colors.Evoker,
+        ["HUNTER"] = KRaidSkipTracker.Colors.Hunter,
+        ["MAGE"] = KRaidSkipTracker.Colors.Mage,
+        ["MONK"] = KRaidSkipTracker.Colors.Monk,
+        ["PALADIN"] = KRaidSkipTracker.Colors.Paladin,
+        ["PRIEST"] = KRaidSkipTracker.Colors.Priest,
+        ["ROGUE"] = KRaidSkipTracker.Colors.Rogue,
+        ["SHAMAN"] = KRaidSkipTracker.Colors.Shaman,
+        ["WARLOCK"] = KRaidSkipTracker.Colors.Warlock,
+        ["WARRIOR"] = KRaidSkipTracker.Colors.Warrior,
+    }
+
+    local color = classToColorTable[class]
+    if color ~= nil then
+        return color
+    end
+
+    return KRaidSkipTracker.Colors.White
+end
 
 function GetRaidInstanceNameFromIdInData(instanceId)
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
