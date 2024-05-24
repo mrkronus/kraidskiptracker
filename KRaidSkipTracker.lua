@@ -92,7 +92,7 @@ function KRaidSkipTracker.GetAllPlayersData()
 end
 
 function KRaidSkipTracker.GetCurrentDataVersion()
-    return C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "Version")
+    return C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "X-Nominal-Version")
 end
 
 function KRaidSkipTracker.InitializeFonts()
