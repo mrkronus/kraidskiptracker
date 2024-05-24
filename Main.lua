@@ -13,12 +13,19 @@ local aceOptions = {
     handler = LibAceAddon,
     type = 'group',
     args = {
-        hideNotStarted = {
+        hideNoProgressRaids = {
             type = "toggle",
-            name = "Hide not started skips",
-            desc = "Toggles the display of skips that have have no progression.",
-            get = "ShouldHideNotStarted",
-            set = "ToggleHideNotStarted",
+            name = "Hide no progress raids",
+            desc = "Toggles the display of raids that have have no progression on any shown characters.",
+            get = "ShouldHideNoProgressRaids",
+            set = "ToggleHideNoProgressRaids",
+        },
+        hideNoProgressToons = {
+            type = "toggle",
+            name = "Hide no progress characters",
+            desc = "Toggles the display of characters that have have no progression on any shown raids.",
+            get = "ShouldHideNoProgressToons",
+            set = "ToggleHideNoProgressToons",
         },
         showOnlyCurrentRealm = {
             type = "toggle",
@@ -39,18 +46,27 @@ local aceOptions = {
 
 local aceOptionsDefaults = {
     profile =  {
-        hideNotStarted = false,
-        showDebugOutput = false,
+        hideNoProgressRaids = false,
+        hideNoProgressToons = false,
         showOnlyCurrentRealm = true,
+        showDebugOutput = false,
     },
 }
 
-function LibAceAddon:ShouldHideNotStarted(info)
-    return self.db.profile.hideNotStarted
+function LibAceAddon:ShouldHideNoProgressRaids(info)
+    return self.db.profile.hideNoProgressRaids
 end
 
-function LibAceAddon:ToggleHideNotStarted(info, value)
-    self.db.profile.hideNotStarted = value
+function LibAceAddon:ToggleHideNoProgressRaids(info, value)
+    self.db.profile.hideNoProgressRaids = value
+end
+
+function LibAceAddon:ShouldHideNoProgressToons(info)
+    return self.db.profile.hideNoProgressToons
+end
+
+function LibAceAddon:ToggleHideNoProgressToons(info, value)
+    self.db.profile.hideNoProgressToons = value
 end
 
 function LibAceAddon:ShouldShowDebugOutput(info)

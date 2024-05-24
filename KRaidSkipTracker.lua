@@ -201,7 +201,7 @@ end
 
 local function AddExpansionToTooltip(tooltip, xpac, cellRow)
     for _, raid in ipairs(xpac) do
-        if LibAceAddon:ShouldHideNotStarted() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
+        if LibAceAddon:ShouldHideNoProgressRaids() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
             if LibAceAddon:ToggleShowDebugOutput() then
                 print("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
             end
@@ -263,7 +263,7 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                         if raid.isStatistic then
                             if quest.isCompleted then
                                 tooltip:SetCell(cellRow, cellColumn, colorize("Acquired", KRaidSkipTracker.Colors.Acquired))
-                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNoProgressRaids() then
                                 -- tooltip:SetCell(cellRow, cellColumn, colorize("Incomplete", KRaidSkipTracker.Colors.Incomplete))
                             end
                         else
@@ -272,7 +272,7 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                             elseif quest.isStarted then
                                 local questObjectives = quest.objectives
                                 tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
-                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNoProgressRaids() then
                                 -- tooltip:SetCell(cellRow, cellColumn, colorize("Not Started", KRaidSkipTracker.Colors.Incomplete))
                             end
                         end                    
