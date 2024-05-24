@@ -170,7 +170,7 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
             if not raid.isStatistic then
                 hoverTooltip:SetFont(MainTextFont)
                 local y, _ = hoverTooltip:AddLine()
-                hoverTooltip:SetCell(y, 1, "|cFFFFD700" .. C_QuestLog.GetTitleForQuestID(questId) .. "|r")
+                hoverTooltip:SetCell(y, 1, colorize(C_QuestLog.GetTitleForQuestID(questId), KRaidSkipTracker.Colors.Header))
 
                 hoverTooltip:SetFont(FooterTextFont)
                 y, _ = hoverTooltip:AddLine()
@@ -207,7 +207,7 @@ local function AddExpansionToTooltip(tooltip, xpac, cellRow)
             end
         else
             tooltip:SetFont(InstanceNameTextFont)
-            tooltip:AddLine(format("|cffffff00%s|r", GetRaidInstanceNameFromIdInData(raid.instanceId)))
+            tooltip:AddLine(colorize(GetRaidInstanceNameFromIdInData(raid.instanceId), KRaidSkipTracker.Colors.SubHeader))
             AddRaidToTooltip(tooltip, raid)
             tooltip:AddSeparator(6,0,0,0,0)
         end
@@ -222,7 +222,7 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
 
     tooltip:SetFont(HeaderFont)
     local y, x = tooltip:AddLine()
-    tooltip:SetCell(y, 1, "|cFFFFD700K Raid Skip Tracker|r")
+    tooltip:SetCell(y, 1, colorize("K Raid Skip Tracker", KRaidSkipTracker.Colors.Header))
 
     KRaidSkipTracker.AddPlayersToTooltip(tooltip, y)
     tooltip:AddSeparator()
@@ -233,7 +233,7 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
     end
 
     tooltip:SetFont(FooterTextFont)
-    tooltip:AddLine("|cFFF5F5F5Right click icon for options|r")
+    tooltip:AddLine(colorize("Right click icon for options", KRaidSkipTracker.Colors.FooterDark))
 end
 
 function KRaidSkipTracker.GetTotalPlayersCountInData()
@@ -246,7 +246,7 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
     tooltip:SetFont(InstanceNameTextFont)
     local cellColumn = 2 -- first column is for the instance name
     for _, players in pairs(PlayersDataToShow) do
-        tooltip:SetCell(cellRow, cellColumn, format("|cffffff00%s|r", players.playerName .. "\n" .. players.playerRealm))
+        tooltip:SetCell(cellRow, cellColumn, colorize(players.playerName .. "\n" .. players.playerRealm, KRaidSkipTracker.Colors.SubHeader))
         tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
         cellColumn = cellColumn + 1
     end
@@ -262,18 +262,18 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                     if quest.questId == questId then
                         if raid.isStatistic then
                             if quest.isCompleted then
-                                tooltip:SetCell(cellRow, cellColumn, "\124cff00ff00Acquired\124r")
+                                tooltip:SetCell(cellRow, cellColumn, colorize("Acquired", KRaidSkipTracker.Colors.Acquired))
                             elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
-                                -- tooltip:SetCell(cellRow, cellColumn, "\124cFFA9A9A9Incomplete\124r")
+                                -- tooltip:SetCell(cellRow, cellColumn, colorize("Incomplete", KRaidSkipTracker.Colors.Incomplete))
                             end
                         else
                             if quest.isCompleted then
-                                tooltip:SetCell(cellRow, cellColumn, format("\124cff00ff00Acquired\124r"))
+                                tooltip:SetCell(cellRow, cellColumn, colorize("Acquired", KRaidSkipTracker.Colors.Acquired))
                             elseif quest.isStarted then
                                 local questObjectives = quest.objectives
                                 tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
                             elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNotStarted() then
-                                -- tooltip:SetCell(cellRow, cellColumn, format("\124cFFA9A9A9Not Started\124r"))
+                                -- tooltip:SetCell(cellRow, cellColumn, colorize("Not Started", KRaidSkipTracker.Colors.Incomplete))
                             end
                         end                    
                         tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
@@ -283,8 +283,6 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
             end
         end
     end
-
-    -- tooltip:SetCell(cellRow, cellColumn, format("|cffffff00%s|r", players.playerName .. "\n" .. players.playerRealm))
 end
 
 function KRaidSkipTracker.UpdateCurrentPlayerData()

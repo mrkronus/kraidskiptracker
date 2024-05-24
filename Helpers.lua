@@ -1,6 +1,60 @@
 
 local addonName, KRaidSkipTracker = ...
 
+KRaidSkipTracker.Colors = {
+    Header       = "FFFFD700",
+    SubHeader    = "FFFFFF00",
+    Footer       = "FFF5F5F5",
+    FooterDark   = "FFA9A9A9",
+    Acquired     = "FF00FF00",
+    Incomplete   = "FFA9A9A9",
+
+	CLASSIC		 = "FFE6CC80",
+	TBC			 = "FF1EFF00",
+	WOTLK		 = "FF66ccff",
+	CATA		 = "FFff3300",
+	MOP			 = "FF00FF96",
+	WOD			 = "FFff8C1A",
+	LEGION		 = "FFA335EE",
+	BFA 		 = "FFFF7D0A",
+	SHADOWLANDS  = "FFE6CC80",
+	DRAGONFLIGHT = "FF33937F",
+
+	Yellow 		 = "FFFFFF00",
+	White 		 = "FFFFFFFF",
+
+	Common 		 = "FFFFFFFF",
+	Uncommon 	 = "FF1EFF00",
+	Rare 		 = "FF0070DD",
+	Epic 		 = "FFA335EE",
+	Legendary 	 = "FFFF8000",
+	Artifact 	 = "FFE6CC80",
+	WowToken	 = "FF00CCFF",
+
+	DeathKnight  = "FFC41F3B",
+	DemonHunter  = "FFA330C9",
+	Druid 		 = "FFFF7D0A",
+	Evoker       = "FF33937F",
+	Hunter 		 = "FFABD473",
+	Mage 		 = "FF69CCF0",
+	Monk 		 = "FF00FF96",
+	Paladin 	 = "FFF58CBA",
+	Priest 		 = "FFFFFFFF",
+	Rogue 		 = "FFFFF569",
+	Shaman 		 = "FF0070DE",
+	Warlock 	 = "FF9482C9",
+	Warrior 	 = "FFC79C6E",
+};
+
+function colorize(s, color)
+    if color and s then
+        return string.format("|c%s%s|r", color, s)
+    else
+        return s
+    end
+end
+
+
 function GetRaidInstanceNameFromIdInData(instanceId)
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
         for _, raid in ipairs(xpac.raids) do
