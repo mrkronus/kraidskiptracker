@@ -199,7 +199,7 @@ end
 
 local function AddExpansionToTooltip(tooltip, xpac, cellRow)
     for _, raid in ipairs(xpac) do
-        if LibAceAddon:ShouldHideNoProgressRaids() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
+        if (LibAceAddon:ShouldAlwaysShowAllRaidHeadings() == false) and LibAceAddon:ShouldHideNoProgressRaids() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
             if LibAceAddon:ToggleShowDebugOutput() then
                 print("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
             end

@@ -27,6 +27,13 @@ local aceOptions = {
             get = "ShouldHideNoProgressToons",
             set = "ToggleHideNoProgressToons",
         },
+        alwaysShowAllRaidHeadings = {
+            type = "toggle",
+            name = "Always Show All Raids",
+            desc = "Forces all raid headers to awlays be shown, regardless of other settings.",
+            get = "ShouldAlwaysShowAllRaidHeadings",
+            set = "ToggleAlwaysShowAllRaidHeadings",
+        },
         showOnlyCurrentRealm = {
             type = "toggle",
             name = "Current realm only",
@@ -48,6 +55,7 @@ local aceOptionsDefaults = {
     profile =  {
         hideNoProgressRaids = false,
         hideNoProgressToons = false,
+        alwaysShowAllRaidHeadings = false,
         showOnlyCurrentRealm = true,
         showDebugOutput = false,
     },
@@ -67,6 +75,14 @@ end
 
 function LibAceAddon:ToggleHideNoProgressToons(info, value)
     self.db.profile.hideNoProgressToons = value
+end
+
+function LibAceAddon:ShouldAlwaysShowAllRaidHeadings(info)
+    return self.db.profile.alwaysShowAllRaidHeadings
+end
+
+function LibAceAddon:ToggleAlwaysShowAllRaidHeadings(info, value)
+    self.db.profile.alwaysShowAllRaidHeadings = value
 end
 
 function LibAceAddon:ShouldShowDebugOutput(info)
