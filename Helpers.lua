@@ -22,6 +22,7 @@ KRaidSkipTracker.Colors = {
 
 	Yellow 		 = "FFFFFF00",
 	White 		 = "FFFFFFFF",
+    Grey         = "FFA9A9A9",
 
 	Common 		 = "FFFFFFFF",
 	Uncommon 	 = "FF1EFF00",
@@ -77,7 +78,7 @@ function classToColor(class)
         return color
     end
 
-    return KRaidSkipTracker.Colors.White
+    return KRaidSkipTracker.Colors.Grey
 end
 
 function GetRaidInstanceNameFromIdInData(instanceId)

@@ -254,11 +254,25 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
 
             hoverTooltip:AddLine(colorize("Player:", KRaidSkipTracker.Colors.White), colorize(players.playerName, KRaidSkipTracker.Colors.White))
             hoverTooltip:AddLine(colorize("Realm:", KRaidSkipTracker.Colors.White), colorize(players.playerRealm, KRaidSkipTracker.Colors.White))
-            hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize(players.playerClass, classToColor(players.englishClass)))
-            hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(players.playerLevel, KRaidSkipTracker.Colors.White))
-            hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(players.playerILevel, KRaidSkipTracker.Colors.White))
+            if players.englishClass ~= nil then
+                hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize(players.playerClass, classToColor(players.englishClass)))
+            else
+                hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
+            end            
+            if players.playerLevel ~= nil then
+                hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(players.playerLevel, KRaidSkipTracker.Colors.White))
+            else
+                hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
+            end
+            if players.playerILevel ~= nil then
+                hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(players.playerILevel, KRaidSkipTracker.Colors.White))
+            else
+                hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
+            end
             if players.lastUpdateServerTime ~= nil then
                 hoverTooltip:AddLine(colorize("Last Update:", KRaidSkipTracker.Colors.White), colorize(date("%m/%d/%y %H:%M:%S", players.lastUpdateServerTime), KRaidSkipTracker.Colors.White))
+            else
+                hoverTooltip:AddLine(colorize("Last Update:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
             end
 
             hoverTooltip:SetAutoHideDelay(0.01, tooltip)
