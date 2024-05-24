@@ -170,7 +170,7 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
 
             if not raid.isStatistic then
                 hoverTooltip:AddLine(colorize(C_QuestLog.GetTitleForQuestID(questId), KRaidSkipTracker.Colors.Header))
-                hoverTooltip:AddLine(colorize("Click for Wowhead link", KRaidSkipTracker.Colors.Footer))
+                hoverTooltip:AddLine(colorize("Click for Wowhead link", KRaidSkipTracker.Colors.FooterDark))
             else
                 hoverTooltip:AddLine(colorize("This raid skip does not have a quest associated with it.", KRaidSkipTracker.Colors.White))
             end
