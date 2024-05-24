@@ -158,7 +158,7 @@ end
 
 local function AddQuestLineToTooltip(tooltip, raid, quest)
     local questId = quest.questId
-    if DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
+    if (LibAceAddon:ShouldHideNoProgressRaids() == false) or DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
         local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
         local y, x = tooltip:AddLine()
         tooltip:SetCell(y, 1, questName)
