@@ -166,23 +166,21 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
         tooltip:SetCellScript(y, 1, "OnEnter", MouseHandler, function()
             local hoverTooltip = LibQTip:Acquire("KKeyedHoverTooltip", 1, "LEFT")
             tooltip.tooltip = hoverTooltip
+            hoverTooltip:SetFont(InstanceNameTextFont)
 
             if not raid.isStatistic then
-                hoverTooltip:SetFont(MainTextFont)
-                local y, _ = hoverTooltip:AddLine()
-                hoverTooltip:SetCell(y, 1, colorize(C_QuestLog.GetTitleForQuestID(questId), KRaidSkipTracker.Colors.Header))
-
-                hoverTooltip:SetFont(FooterTextFont)
-                y, _ = hoverTooltip:AddLine()
-                hoverTooltip:SetCell(y, 1, "Click for Wowhead link")
-
-                hoverTooltip:SetAutoHideDelay(0.01, tooltip)
-                hoverTooltip:SmartAnchorTo(tooltip)
-                hoverTooltip:Show()
+                hoverTooltip:AddLine(colorize(C_QuestLog.GetTitleForQuestID(questId), KRaidSkipTracker.Colors.Header))
+                hoverTooltip:AddLine(colorize("Click for Wowhead link", KRaidSkipTracker.Colors.Footer))
+            else
+                hoverTooltip:AddLine(colorize("This raid skip does not have a quest associated with it.", KRaidSkipTracker.Colors.White))
             end
+
+            hoverTooltip:SetAutoHideDelay(0.01, tooltip)
+            hoverTooltip:SmartAnchorTo(tooltip)
+            hoverTooltip:Show()
         end)
         tooltip:SetCellScript(y, 1, "OnLeave", MouseHandler, function()
-            if tooltip.tooltip then
+            if tooltip.tooltip ~= nil then
                 tooltip.tooltip:Release()
                 tooltip.tooltip = nil
             end
@@ -248,6 +246,32 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
     for _, players in pairs(PlayersDataToShow) do
         tooltip:SetCell(cellRow, cellColumn, colorize(players.playerName .. "\n" .. players.playerRealm, classToColor(players.englishClass)))
         tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
+        tooltip:SetCellScript(cellRow, cellColumn, "OnEnter", MouseHandler, function()
+            local hoverTooltip = LibQTip:Acquire("KKeyedHoverTooltip", 2, "LEFT", "RIGHT")
+            tooltip.tooltip = hoverTooltip
+
+            hoverTooltip:SetFont(InstanceNameTextFont)
+
+            hoverTooltip:AddLine(colorize("Player:", KRaidSkipTracker.Colors.White), colorize(players.playerName, KRaidSkipTracker.Colors.White))
+            hoverTooltip:AddLine(colorize("Realm:", KRaidSkipTracker.Colors.White), colorize(players.playerRealm, KRaidSkipTracker.Colors.White))
+            hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize(players.playerClass, classToColor(players.englishClass)))
+            hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(players.playerLevel, KRaidSkipTracker.Colors.White))
+            hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(players.playerILevel, KRaidSkipTracker.Colors.White))
+            if players.lastUpdateServerTime ~= nil then
+                hoverTooltip:AddLine(colorize("Last Update:", KRaidSkipTracker.Colors.White), colorize(date("%m/%d/%y %H:%M:%S", players.lastUpdateServerTime), KRaidSkipTracker.Colors.White))
+            end
+
+            hoverTooltip:SetAutoHideDelay(0.01, tooltip)
+            hoverTooltip:SmartAnchorTo(tooltip)
+            hoverTooltip:Show()
+
+        end)
+        tooltip:SetCellScript(cellRow, cellColumn, "OnLeave", MouseHandler, function()
+            if tooltip.tooltip ~= nil then
+                tooltip.tooltip:Release()
+                tooltip.tooltip = nil
+            end
+        end)
         cellColumn = cellColumn + 1
     end
 end
@@ -337,6 +361,6 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
 
     -- assign the all xpacs table to the player data
     AllPlayersData[CurrentPlayerIdString] = nil
-    AllPlayersData[CurrentPlayerIdString] = { playerName = UnitName("player"), playerRealm = GetRealmName(), playerClass = playerClass, englishClass = englishClass, playerLevel = playerLevel, iLevel = overallILevel, shouldShow = true, lastUpdateServerTime = lastUpdateTime, data = allxpacsTable}
+    AllPlayersData[CurrentPlayerIdString] = { playerName = UnitName("player"), playerRealm = GetRealmName(), playerClass = playerClass, englishClass = englishClass, playerLevel = playerLevel, playerILevel = overallILevel, shouldShow = true, lastUpdateServerTime = lastUpdateTime, data = allxpacsTable}
 
 end
