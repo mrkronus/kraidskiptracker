@@ -209,22 +209,33 @@ local function AddExpansionToTooltip(tooltip, xpac, cellRow)
             local internalRaidData = GetRaidInstanceDataFromId(raid.instanceId)
             tooltip:SetCell(y, 1, colorize(internalRaidData.instanceName, KRaidSkipTracker.Colors.SubHeader))
 
+            tooltip:SetCellScript(y, 1, "OnMouseUp", MouseHandler, function()
+                if (not EncounterJournal_OpenJournal) then
+                    UIParentLoadAddOn('Blizzard_EncounterJournal')
+                end
+                EncounterJournal_OpenJournal(16, internalRaidData.journalInstanceId) -- 16 is mythic raid
+            end)
             tooltip:SetCellScript(y, 1, "OnEnter", MouseHandler, function()
                 local hoverTooltip = LibQTip:Acquire("KKeyedHoverTooltip", 2, "LEFT", "RIGHT")
                 tooltip.tooltip = hoverTooltip
 
                 hoverTooltip:SetFont(HeaderFont)
-                hoverTooltip:AddHeader(internalRaidData.instanceShortName)
+                hoverTooltip:AddHeader(colorize(internalRaidData.instanceShortName, KRaidSkipTracker.Colors.Header))
                 hoverTooltip:AddSeparator()
 
                 hoverTooltip:SetFont(InstanceNameTextFont)
                 local hoverY, hoverX = hoverTooltip:AddLine()
                 hoverTooltip:SetCell(hoverY, hoverX, colorize(internalRaidData.instanceDescriptionText, KRaidSkipTracker.Colors.White), nil, "LEFT", 2, nil, nil, nil, 250, nil)
                 hoverTooltip:AddSeparator(6,0,0,0,0)
+                
                 hoverTooltip:AddLine(colorize("Expansion: ", KRaidSkipTracker.Colors.White), colorize(GetExpansionFromFromRaidInstanceId(raid.instanceId), KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Containing zone: ", KRaidSkipTracker.Colors.White), colorize(C_Map.GetMapInfo(internalRaidData.locatedInZoneId).name, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Required level to enter: ", KRaidSkipTracker.Colors.White), colorize(internalRaidData.requiredLevel, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Number of players: ", KRaidSkipTracker.Colors.White), colorize(internalRaidData.numberOfPlayers, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddSeparator(6,0,0,0,0)
+                
+                hoverTooltip:SetFont(FooterTextFont)
+                hoverTooltip:AddLine(colorize("Click to open Adventure Journal", KRaidSkipTracker.Colors.FooterDark))
 
                 hoverTooltip:SetAutoHideDelay(0.01, tooltip)
                 hoverTooltip:SmartAnchorTo(tooltip)

@@ -35,7 +35,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- WOD: Blackrock Foundry
             {
-                instanceName = "WOD: Blackrock Foundry", instanceShortName = "Blackrock Foundry", instanceId = 1205, isStatistic = false,
+                instanceName = "WOD: Blackrock Foundry", instanceShortName = "Blackrock Foundry", instanceId = 1205, journalInstanceId = 457, isStatistic = false,
                 requiredLevel = "40", numberOfPlayers = "10/30", locatedInZoneId = 543, -- Gorgrond 
                 instanceDescriptionText = "Starting NPC:\nAfter defeating The Iron Maidens (about halfway through the raid), a hidden path to the east through some cargo becomes available. At the end of the winding path, Goraluk Anvilcrack can be found and will give the quest Sigil of the Black Hand.\n\nUsing the Skip:\nIf anyone in the raid has the skip, two large stones on either side of the entrance to Blackhand become usable. Interacting with them allows the raid to skip all other bosses.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels.",
                 quests =
@@ -48,7 +48,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- WOD: Hellfire Citadel
             {
-                instanceName = "WOD: Hellfire Citadel", instanceShortName = "Hellfire Citadel", instanceId = 1448, isStatistic = false,
+                instanceName = "WOD: Hellfire Citadel", instanceShortName = "Hellfire Citadel", instanceId = 1448, journalInstanceId = 669, isStatistic = false,
                 requiredLevel = "40", numberOfPlayers = "10/30", locatedInZoneId = 534, -- Tanaan Jungle
                 instanceDescriptionText = "Starting NPC:\nThere are two quests to fully unlock the skip. One for the first half, and one for the second half. Khadgar (available in multiple places in the instance) gives both, the first after killing the 2nd boss, Iron Reaver. Completing the first quest allows access to the second.\n\nUsing the Skip:\nIf anyone in the raid has either skip quest completed, a special portal will appear on the south wall, near the entrace to the raid, after all the NPCs spawn in.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels.",
                 quests =
@@ -69,7 +69,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- Legion: The Emerald Nightmare
             {
-                instanceName = "Legion: The Emerald Nightmare", instanceShortName = "The Emerald Nightmare", instanceId = 1520, isStatistic = false,
+                instanceName = "Legion: The Emerald Nightmare", instanceShortName = "The Emerald Nightmare", instanceId = 1520, journalInstanceId = 768, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 641, -- Val'sharah
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -82,7 +82,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- Legion: The Nighthold
             {
-                instanceName = "Legion: The Nighthold", instanceShortName = "The Nighthold", instanceId = 1530, isStatistic = false,
+                instanceName = "Legion: The Nighthold", instanceShortName = "The Nighthold", instanceId = 1530, journalInstanceId = 786, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 680, -- Suramar 
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -95,7 +95,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- Legion: Tomb of Sargeras
             {
-                instanceName = "Legion: Tomb of Sargeras", instanceShortName = "Tomb of Sargeras", instanceId = 1676, isStatistic = false,
+                instanceName = "Legion: Tomb of Sargeras", instanceShortName = "Tomb of Sargeras", instanceId = 1676, journalInstanceId = 875, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 646, -- The Broken Shore 
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -108,7 +108,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- Legion: Antorus, the Burning Throne
             {
-                instanceName = "Legion: Antorus, the Burning Throne", instanceShortName = "Antorus, the Burning Throne", instanceId = 1712, isStatistic = false,
+                instanceName = "Legion: Antorus, the Burning Throne", instanceShortName = "Antorus, the Burning Throne", instanceId = 1712, journalInstanceId = 946, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 885, -- Argus: Antoran Wastes
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -129,7 +129,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- BFA: Ny'alotha, the Waking City
             {
-                instanceName = "BFA: Ny'alotha, the Waking City", instanceShortName = "Ny'alotha, the Waking City", instanceId = 2217, isStatistic = false,
+                instanceName = "BFA: Ny'alotha, the Waking City", instanceShortName = "Ny'alotha, the Waking City", instanceId = 2217, journalInstanceId = 1180, isStatistic = false,
                 requiredLevel = "50", numberOfPlayers = "10/30", locatedInZoneId = 1527, -- Uldum
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -142,7 +142,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- BFA: Battle of Dazar'alor
             {
-                instanceName = "BFA: Battle of Dazar'alor", instanceShortName = "Battle of Dazar'alor", instanceId = 2070, isStatistic = true,
+                instanceName = "BFA: Battle of Dazar'alor", instanceShortName = "Battle of Dazar'alor", instanceId = 2070, journalInstanceId = 1176, isStatistic = true,
                 requiredLevel = "50", numberOfPlayers = "10/30", locatedInZoneId = 862, -- Zuldazar 
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -158,7 +158,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- SL: Castle Nathria
             {
-                instanceName = "SL: Castle Nathria", instanceShortName = "Castle Nathria", instanceId = 2296, isStatistic = false,
+                instanceName = "SL: Castle Nathria", instanceShortName = "Castle Nathria", instanceId = 2296, journalInstanceId = 1190, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1525, -- Revendreth 
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -170,7 +170,7 @@ KRaidSkipTracker.questDataByExpansion =
             },
             -- SL: Sanctum of Domination
             {
-                instanceName = "SL: Sanctum of Domination", instanceShortName = "Sanctum of Domination", instanceId = 2450, isStatistic = false,
+                instanceName = "SL: Sanctum of Domination", instanceShortName = "Sanctum of Domination", instanceId = 2450, journalInstanceId = 1193, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1543, -- The Maw
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -182,7 +182,7 @@ KRaidSkipTracker.questDataByExpansion =
             },
             -- SL: Sepulcher of the First Ones
             {
-                instanceName = "SL: Sepulcher of the First Ones", instanceShortName = "Sepulcher of the First Ones", instanceId = 2481, isStatistic = false,
+                instanceName = "SL: Sepulcher of the First Ones", instanceShortName = "Sepulcher of the First Ones", instanceId = 2481, journalInstanceId = 1195, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1970, -- Zereth Mortis
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -200,7 +200,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- DF: Vault of the Incarnates
             {
-                instanceName = "DF: Vault of the Incarnates", instanceShortName = "Vault of the Incarnates", instanceId = 2522, isStatistic = false,
+                instanceName = "DF: Vault of the Incarnates", instanceShortName = "Vault of the Incarnates", instanceId = 2522, journalInstanceId = 1200, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2025, -- Thaldraszus 
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -213,7 +213,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- DF: Aberrus, the Shadowed Crucible
             {
-                instanceName = "DF: Aberrus, the Shadowed Crucible", instanceShortName = "Aberrus, the Shadowed Crucible", instanceId = 2569, isStatistic = false,
+                instanceName = "DF: Aberrus, the Shadowed Crucible", instanceShortName = "Aberrus, the Shadowed Crucible", instanceId = 2569, journalInstanceId = 1208, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2133, -- Zarelek Cavern
                 instanceDescriptionText = "(raid info todo)",
                 quests =
@@ -226,7 +226,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- DF: Amirdrassil, the Dream's Hope
             {
-                instanceName = "DF: Amirdrassil, the Dream's Hope", instanceShortName = "Amirdrassil, the Dream's Hope", instanceId = 2549, isStatistic = false,
+                instanceName = "DF: Amirdrassil, the Dream's Hope", instanceShortName = "Amirdrassil, the Dream's Hope", instanceId = 2549, journalInstanceId = 1207, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2200, -- Emerald Dream
                 instanceDescriptionText = "(raid info todo)",
                 quests =
