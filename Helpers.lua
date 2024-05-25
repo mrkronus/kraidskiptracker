@@ -81,6 +81,28 @@ function classToColor(class)
     return KRaidSkipTracker.Colors.Grey
 end
 
+function GetExpansionFromFromRaidInstanceId(instanceId)
+    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        for _, raid in ipairs(xpac.raids) do
+            if raid.instanceId == instanceId then
+                return xpac.expansionName
+            end
+        end
+    end
+    return "(no instance name)"
+end
+
+function GetRaidInstanceDataFromId(instanceId)
+    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        for _, raid in ipairs(xpac.raids) do
+            if raid.instanceId == instanceId then
+                return raid
+            end
+        end
+    end
+    return "(no instance name)"
+end
+
 function GetRaidInstanceNameFromIdInData(instanceId)
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
         for _, raid in ipairs(xpac.raids) do
