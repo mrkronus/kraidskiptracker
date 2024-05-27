@@ -11,52 +11,74 @@ LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3
 local aceOptions = {
     name = "K Raid Skip Tracker",
     handler = LibAceAddon,
-    type = 'group',
+    type = "group",
     args = {
+        alwaysShowAllRaidHeadings = {
+            type = "toggle",
+            width = "full",
+            order = 1,
+            name = "Always show all raid headings",
+            desc = "Forces all raid headers to awlays be shown, regardless of other settings.",
+            get = "ShouldAlwaysShowAllRaidHeadings",
+            set = "ToggleAlwaysShowAllRaidHeadings",
+        },
         hideNoProgressRaids = {
             type = "toggle",
-            name = "Hide no progress raids",
+            width = "full",
+            order = 2,
+            name = "Hide raid quests with no progress",
             desc = "Toggles the display of raids that have have no progression on any shown characters.",
             get = "ShouldHideNoProgressRaids",
             set = "ToggleHideNoProgressRaids",
         },
         hideNoProgressToons = {
             type = "toggle",
-            name = "Hide no progress characters",
+            width = "full",
+            order = 3,
+            disabled = true,
+            name = "Hide characters with no progress",
             desc = "Toggles the display of characters that have have no progression on any shown raids.",
             get = "ShouldHideNoProgressToons",
             set = "ToggleHideNoProgressToons",
         },
-        alwaysShowAllRaidHeadings = {
-            type = "toggle",
-            name = "Always Show All Raids",
-            desc = "Forces all raid headers to awlays be shown, regardless of other settings.",
-            get = "ShouldAlwaysShowAllRaidHeadings",
-            set = "ToggleAlwaysShowAllRaidHeadings",
-        },
         showOnlyCurrentRealm = {
             type = "toggle",
-            name = "Current realm only",
+            width = "full",
+            order = 4,
+            name = "Show current realm only",
             desc = "Toggles hiding all characters from realms other than " .. GetRealmName() .. ".",
             get = "ShouldShowOnlyCurrentRealm",
             set = "ToggleShowOnlyCurrentRealm",
         },
+        fitToScreen = {
+            type = "toggle",
+            width = "full",
+            order = 50,
+            name = "Fit window to screen",
+            desc = "Scales the entire window to fit on the screen. Useful if you have many characters and content would otherwise run off the side of the screen.",
+            get = "ShouldFitToScreen",
+            set = "ToggleFitToScreen",
+        },
         showDebugOutput = {
             type = "toggle",
-            name = "Show debug output",
-            desc = "Toggles the display debugging Text in the chat window. Recommended to leave off.",
+            width = "full",
+            order = 100,
+            name = "Show debug output in chat",
+            desc = "Toggles the display debugging Text in the chat window. " ..
+            colorize("Recommended to leave off.", KRaidSkipTracker.Colors.Red),
             get = "ShouldShowDebugOutput",
             set = "ToggleShowDebugOutput",
+            confirm = true
         },
     },
 }
-
 local aceOptionsDefaults = {
     profile =  {
         hideNoProgressRaids = false,
         hideNoProgressToons = false,
         alwaysShowAllRaidHeadings = false,
         showOnlyCurrentRealm = true,
+        fitToScreen = true,
         showDebugOutput = false,
     },
 }
@@ -85,20 +107,28 @@ function LibAceAddon:ToggleAlwaysShowAllRaidHeadings(info, value)
     self.db.profile.alwaysShowAllRaidHeadings = value
 end
 
-function LibAceAddon:ShouldShowDebugOutput(info)
-    return self.db.profile.showDebugOutput
-end
-
-function LibAceAddon:ToggleShowDebugOutput(info, value)
-    self.db.profile.showDebugOutput = value
-end
-
 function LibAceAddon:ShouldShowOnlyCurrentRealm(info)
     return self.db.profile.showOnlyCurrentRealm
 end
 
 function LibAceAddon:ToggleShowOnlyCurrentRealm(info, value)
     self.db.profile.showOnlyCurrentRealm = value
+end
+
+function LibAceAddon:ShouldFitToScreen(info)
+    return self.db.profile.fitToScreen
+end
+
+function LibAceAddon:ToggleFitToScreen(info, value)
+    self.db.profile.fitToScreen = value
+end
+
+function LibAceAddon:ShouldShowDebugOutput(info)
+    return self.db.profile.showDebugOutput
+end
+
+function LibAceAddon:ToggleShowDebugOutput(info, value)
+    self.db.profile.showDebugOutput = value
 end
 
 function LibAceAddon:OnInitialize()
@@ -152,7 +182,22 @@ local function tipOnEnter(self)
 
 	tooltip:SetAutoHideDelay(0.01, self)
     tooltip:SmartAnchorTo(self)
-	tooltip:UpdateScrolling()
+
+    if LibAceAddon:ShouldFitToScreen() then
+        local toolTipScale = tooltip:GetScale()
+        local toolTipWidth, toolTipHeight = tooltip:GetSize()
+        local parentWidth, parentHeight = UIParent:GetSize()
+        toolTipWidth = toolTipWidth * toolTipScale
+        toolTipHeight = toolTipHeight * toolTipScale
+        if toolTipWidth > parentWidth or toolTipHeight > parentHeight then
+            toolTipScale = toolTipScale / math.max(toolTipWidth / parentWidth, toolTipHeight / parentHeight)
+            toolTipScale = toolTipScale * 0.95 -- scale it down just a bit more to make it look nicer
+            tooltip:SetScale(toolTipScale)
+        end
+    else
+        tooltip:UpdateScrolling()
+    end
+
     tooltip:Show()
 end
 

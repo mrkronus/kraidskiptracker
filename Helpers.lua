@@ -23,6 +23,7 @@ KRaidSkipTracker.Colors = {
 	Yellow 		 = "FFFFFF00",
 	White 		 = "FFFFFFFF",
     Grey         = "FFA9A9A9",
+    Red          = "FFFF0000",
 
 	Common 		 = "FFFFFFFF",
 	Uncommon 	 = "FF1EFF00",
@@ -80,6 +81,14 @@ function classToColor(class)
 
     return KRaidSkipTracker.Colors.Grey
 end
+
+KRaidSkipTracker.TextIcons =
+{
+    GreenCheck = '\124A:ui-lfg-readymark-raid:14:14\124a',
+    GreenCheckLite = '\124A:UI-LFG-ReadyMark:14:14\124a',
+    QuestQuestion = '\124A:QuestTurnin:14:14\124a',
+    QuestExclamation = '\124A:QuestNormal:14:14\124a',
+}
 
 function GetExpansionFromFromRaidInstanceId(instanceId)
     for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do

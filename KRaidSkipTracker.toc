@@ -4,11 +4,11 @@
 ## SavedVariables: KRaidSkipTrackerDB
 
 ## Notes: KRaidSkipTracker
-## Author: Katatonik_Kat and Kronus
-## Version: 10.2.7.11
+## Author: Kronus and Katatonik_Kat
+## Version: 10.2.7.12
 ## Dependencies: 
 ## LoadOnDemand: 0
-## X-Nominal-Version: 11
+## X-Nominal-Version: 12
 ## X-Curse-Project-ID: 978841
 
 ## OptionalDeps: Ace3

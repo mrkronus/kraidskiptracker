@@ -156,11 +156,14 @@ function KRaidSkipTracker.Initialize()
     KRaidSkipTracker.PreQueryAllQuestData()
 end
 
-local function AddQuestLineToTooltip(tooltip, raid, quest)
+local function AddQuestLineToTooltip(tooltip, raid, quest, shouldHighlight)
     local questId = quest.questId
     if (LibAceAddon:ShouldHideNoProgressRaids() == false) or DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
         local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
         local y, x = tooltip:AddLine()
+        if shouldHighlight then
+            tooltip:SetLineColor(y, 1, 1, 1, 0.1)
+        end
         tooltip:SetCell(y, 1, questName)
         tooltip:SetCellScript(y, 1, "OnMouseUp", MouseHandler, function() ShowKRaidSkipTrackerCopyTextPopup(C_QuestLog.GetTitleForQuestID(questId), "https://www.wowhead.com/quest=" .. questId) end)
         tooltip:SetCellScript(y, 1, "OnEnter", MouseHandler, function()
@@ -187,13 +190,19 @@ local function AddQuestLineToTooltip(tooltip, raid, quest)
         end)
 
         KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, y)
+        return true
     end
+    return false
 end
 
 local function AddRaidToTooltip(tooltip, raid)
+    local shouldHighlight = true
     for _, quest in ipairs(raid.quests) do
         tooltip:SetFont(MainTextFont)
-        AddQuestLineToTooltip(tooltip, raid, quest)
+        local wasAdded = AddQuestLineToTooltip(tooltip, raid, quest, shouldHighlight)
+        if wasAdded then
+            shouldHighlight = not shouldHighlight
+        end
     end
 end
 
@@ -227,13 +236,13 @@ local function AddExpansionToTooltip(tooltip, xpac, cellRow)
                 local hoverY, hoverX = hoverTooltip:AddLine()
                 hoverTooltip:SetCell(hoverY, hoverX, colorize(internalRaidData.instanceDescriptionText, KRaidSkipTracker.Colors.White), nil, "LEFT", 2, nil, nil, nil, 250, nil)
                 hoverTooltip:AddSeparator(6,0,0,0,0)
-                
+
                 hoverTooltip:AddLine(colorize("Expansion: ", KRaidSkipTracker.Colors.White), colorize(GetExpansionFromFromRaidInstanceId(raid.instanceId), KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Containing zone: ", KRaidSkipTracker.Colors.White), colorize(C_Map.GetMapInfo(internalRaidData.locatedInZoneId).name, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Required level to enter: ", KRaidSkipTracker.Colors.White), colorize(internalRaidData.requiredLevel, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Number of players: ", KRaidSkipTracker.Colors.White), colorize(internalRaidData.numberOfPlayers, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddSeparator(6,0,0,0,0)
-                
+
                 hoverTooltip:SetFont(FooterTextFont)
                 hoverTooltip:AddLine(colorize("Click to open Adventure Journal", KRaidSkipTracker.Colors.FooterDark))
 
@@ -258,7 +267,7 @@ function KRaidSkipTracker.PopulateTooltip(tooltip)
     UpdateSortedPlayersData()
     tooltip:SetCellMarginH(10) -- must be done before any data is added
     local playersCount = KRaidSkipTracker.GetTotalPlayersCountInData()
-    for i=1,playersCount do tooltip:AddColumn("RIGHT") end
+    for i=1,playersCount do tooltip:AddColumn("CENTER") end
 
     tooltip:SetFont(HeaderFont)
     local y, x = tooltip:AddLine()
@@ -370,13 +379,13 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                     if quest.questId == questId then
                         if raid.isStatistic then
                             if quest.isCompleted then
-                                tooltip:SetCell(cellRow, cellColumn, colorize("Acquired", KRaidSkipTracker.Colors.Acquired))
+                                tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
                             elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNoProgressRaids() then
                                 -- tooltip:SetCell(cellRow, cellColumn, colorize("Incomplete", KRaidSkipTracker.Colors.Incomplete))
                             end
                         else
                             if quest.isCompleted then
-                                tooltip:SetCell(cellRow, cellColumn, colorize("Acquired", KRaidSkipTracker.Colors.Acquired))
+                                tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
                             elseif quest.isStarted then
                                 local questObjectives = quest.objectives
                                 tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
