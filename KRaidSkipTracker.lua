@@ -361,8 +361,8 @@ local function PopulateTooltip(tooltip)
         local totalToons =  GetTotalPlayersCountInAllPlayersData();
 
         hoverTooltip:SetFont(InstanceNameTextFont)
-        hoverTooltip:AddLine(colorize("Total Shown Characters: ", KRaidSkipTracker.Colors.White), colorize(playersCount, KRaidSkipTracker.Colors.White))
-        hoverTooltip:AddLine(colorize("Total Tracked Characters: ", KRaidSkipTracker.Colors.White), colorize(totalToons, KRaidSkipTracker.Colors.White))
+        hoverTooltip:AddLine(colorize("Total Shown Characters: ", KRaidSkipTracker.Colors.White), colorize(tostring(playersCount), KRaidSkipTracker.Colors.White))
+        hoverTooltip:AddLine(colorize("Total Tracked Characters: ", KRaidSkipTracker.Colors.White), colorize(tostring(totalToons), KRaidSkipTracker.Colors.White))
         hoverTooltip:AddSeparator()
         hoverTooltip:AddLine(colorize(" ", nil), colorize(C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "Version"), KRaidSkipTracker.Colors.Grey))
 
