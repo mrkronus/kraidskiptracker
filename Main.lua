@@ -6,10 +6,11 @@ local addonName, KRaidSkipTracker = ...
 --
 -- AceAddon initialization
 --
-LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3.0", "AceEvent-3.0")
+local LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3.0", "AceEvent-3.0")
+KRaidSkipTracker.LibAceAddon = LibAceAddon
 
 local aceOptions = {
-    name = "K Raid Skip Tracker",
+    name = "\124TInterface/Icons/inv_misc_key_15:0\124t K Raid Skip Tracker",
     handler = LibAceAddon,
     type = "group",
     args = {
@@ -53,7 +54,7 @@ local aceOptions = {
         fitToScreen = {
             type = "toggle",
             width = "full",
-            order = 50,
+            order = 20,
             name = "Fit window to screen",
             desc = "Scales the entire window to fit on the screen. Useful if you have many characters and content would otherwise run off the side of the screen.",
             get = "ShouldFitToScreen",
@@ -62,16 +63,16 @@ local aceOptions = {
         showDebugOutput = {
             type = "toggle",
             width = "full",
-            order = 100,
+            order = 29,
             name = "Show debug output in chat",
-            desc = "Toggles the display debugging Text in the chat window. " ..
-            colorize("Recommended to leave off.", KRaidSkipTracker.Colors.Red),
+            desc = "Toggles the display debugging Text in the chat window. "..colorize("Recommended to leave off.", KRaidSkipTracker.Colors.Red),
             get = "ShouldShowDebugOutput",
             set = "ToggleShowDebugOutput",
             confirm = true
         },
     },
 }
+
 local aceOptionsDefaults = {
     profile =  {
         hideNoProgressRaids = false,
@@ -131,6 +132,7 @@ function LibAceAddon:ToggleShowDebugOutput(info, value)
     self.db.profile.showDebugOutput = value
 end
 
+playersToShowInOptions = {}
 function LibAceAddon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("KRaidSkipTrackerDB", aceOptionsDefaults, true)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("KRaidSkipTracker", aceOptions, {"kraidskiptracker", "krst"})
@@ -140,6 +142,148 @@ function LibAceAddon:OnInitialize()
 
     self.db.profile.dataVersion = KRaidSkipTracker.GetCurrentDataVersion()
     self.db.profile.allPlayersData = KRaidSkipTracker.GetAllPlayersData()
+
+    aceOptions.args.charactersHeader = {
+        type = "header",
+        width = "full",
+        order = 30,
+        name = "Characters",
+    }
+
+    playersToShowInOptions = {}
+    local addData = KRaidSkipTracker.GetAllPlayersData()
+    for k, v in pairs(addData) do
+        playersToShowInOptions[k] = v
+    end
+    table.sort(playersToShowInOptions, function(a, b)
+        if a.playerRealm ~= b.playerRealm then
+            return a.playerRealm < b.playerRealm
+        end
+        return a.playerName < b.playerName
+    end)
+
+    aceOptions.args.deleteAllButton = {
+        type = "execute",
+        name = "Delete All Addon Data",
+        width = "double",
+        order = 100,
+        desc = "Deletes all players from the stored database.\n\n"..colorize("If you accept, you will need to log into each character again to get the data back.", KRaidSkipTracker.Colors.Red),
+        confirm = true,
+        func = function() print("DELETE ALL") end,
+    }
+
+    -- We start at 31 for the worst case scenario of all 
+    -- 60 toons being on seperate realms and to leave 
+    -- some for other things afterwards.
+    local orderIndex = 31
+    for _, player in pairs(playersToShowInOptions) do
+        if aceOptions.args[player.playerRealm] == nil then
+            aceOptions.args[player.playerRealm] = {
+                type = "group",
+                width = "full",
+                order = orderIndex,
+                name = player.playerRealm,
+                args = {}
+            }
+        end
+
+        aceOptions.args[player.playerRealm].args[player.playerName] = {
+            type = "group",
+            order = orderIndex,
+            name = (player.englishClass ~= nil and (getClassIcon(player.englishClass).." "..colorize(player.playerName, classToColor(player.englishClass))) or player.playerName),
+            args = {
+                characterHeader = {
+                type = "header",
+                width = "full",
+                order = 1,
+                name = (player.englishClass ~= nil and (getClassIcon(player.englishClass).." "..colorize(player.playerName, classToColor(player.englishClass))) or player.playerName),
+                },
+                headerDescription = {
+                    type = "description",
+                    width = "double",
+                    fontSize = "Large",
+                    order = 2,
+                    name = (player.playerLevel ~= nil and "\n" or "Some data is not avaiable, please log into this character to update.\n\n"),
+                },
+                playerRealm = {
+                    type = "description",
+                    width = "double",
+                    order = 10,
+                    name = "Realm: "..player.playerRealm,
+                },
+                playerLevel = {
+                    type = "description",
+                    width = "double",
+                    order = 11,
+                    name = "Level: "..(player.playerLevel ~= nil and player.playerLevel or "(unknown)"),
+                },
+                playerIlevel = {
+                    type = "description",
+                    width = "double",
+                    order = 12,
+                    name = "iLvl: "..(player.playerILevel ~= nil and math.floor(player.playerILevel + 0.5) or "(unknown)"),
+                },
+                playerClass = {
+                    type = "description",
+                    width = "double",
+                    order = 13,
+                    name = function() if player.englishClass ~= nil then return "Class: "..colorize(player.playerClass, classToColor(player.englishClass)) else return "Class: (unknown)" end end,
+                },
+                lastSynced = {
+                    type = "description",
+                    width = "double",
+                    order = 14,
+                    name = "Last Synced: "..(player.lastUpdateServerTime ~= nil and date("%m/%d/%y %H:%M:%S", player.lastUpdateServerTime) or "(unknown)"),
+                },
+                footerDescription = {
+                    type = "description",
+                    width = "double",
+                    order = 49,
+                    name = "\n",
+                },
+                enableButton = {
+                    type = "execute",
+                    name = player.shouldShow and "Hide" or "Show",
+                    width = "double",
+                    desc = "Toggles visibililty of the currently selected character but will not delete the associated data.",
+                    order = 50,
+                    func = function() kprint("TOGGLE "..player.playerName.." - "..player.playerRealm) end,
+                },
+                deleteButton = {
+                    type = "execute",
+                    name = "Delete",
+                    width = "half",
+                    desc = "Are you sure you want to delete instance and raid data for "..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize("This action cannot be undone and will require logging into this character again to get the data back.", KRaidSkipTracker.Colors.Red),
+                    confirm = true,
+                    order = 51,
+                    func = function() kprint("DELETE "..player.playerName.." - "..player.playerRealm) end,
+                }
+            }
+        }
+
+        -- local deleteButtonName = "deleteButton".."-"..player.playerName.."-"..player.playerRealm
+        -- aceOptions.args[player.playerRealm].args[deleteButtonName] = {
+        --     type = "execute",
+        --     name = "Delete",
+        --     width = "half",
+        --     order = orderIndex,
+        --     desc = "Are you sure you want to delete instance and raid data for "..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize("This action cannot be undone and will require logging into that character again to get it back.", KRaidSkipTracker.Colors.Red),
+        --     confirm = true,
+        --     func = function() print("DELETE "..player.playerName.." - "..player.playerRealm) end,
+        -- }
+
+        -- local deleteButtonName = "toggleButton".."-"..player.playerName.."-"..player.playerRealm
+        -- aceOptions.args[player.playerRealm].args[deleteButtonName] = {
+        --     type = "execute",
+        --     name = player.shouldShow and "Disable" or "Enable",
+        --     width = "normal",
+        --     order = orderIndex,
+        --     desc = "Toggles visibililty of "..player.playerName.." - "..player.playerRealm.." without deleting the associated data.",
+        --     func = function() print("DELETE "..player.playerName.." - "..player.playerRealm) end,
+        -- }
+
+        orderIndex = orderIndex + 1
+    end
 end
 
 function LibAceAddon:GetDBAllPlayersData()

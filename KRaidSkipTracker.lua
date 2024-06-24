@@ -75,8 +75,6 @@ end
 ---------------------------------------------------------------------------]]
 
 local function MouseHandler(event, func, button, ...)
-	local name = func
-
 	if _G.type(func) == "function" then
 		func(event, func,button, ...)
 	else
@@ -103,7 +101,7 @@ function KRaidSkipTracker.InitializeFonts()
 end
 
 function KRaidSkipTracker.LoadData()
-    AllPlayersData = LibAceAddon:GetDBAllPlayersData()
+    AllPlayersData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData()
 end
 
 function UpdateSortedPlayersData()
@@ -114,7 +112,7 @@ function UpdateSortedPlayersData()
         if(player.playerName == UnitName("player") and player.playerRealm == GetRealmName()) then
             playerData = player
         else
-            if(LibAceAddon:ShouldShowOnlyCurrentRealm() and player.playerRealm ~= GetRealmName()) then
+            if(KRaidSkipTracker.LibAceAddon:ShouldShowOnlyCurrentRealm() and player.playerRealm ~= GetRealmName()) then
                 -- continue
             else
                 table.insert(PlayersDataToShow, insertLocation, player) 
@@ -158,7 +156,7 @@ end
 
 local function AddQuestLineToTooltip(tooltip, raid, quest, shouldHighlight)
     local questId = quest.questId
-    if (LibAceAddon:ShouldHideNoProgressRaids() == false) or DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
+    if (KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() == false) or DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) then
         local questName = GetQuestDisplayNameFromIdInData(questId) .. ": "
         local y, x = tooltip:AddLine()
         if shouldHighlight then
@@ -208,8 +206,8 @@ end
 
 local function AddExpansionToTooltip(tooltip, xpac, cellRow)
     for _, raid in ipairs(xpac) do
-        if (LibAceAddon:ShouldAlwaysShowAllRaidHeadings() == false) and LibAceAddon:ShouldHideNoProgressRaids() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
-            if LibAceAddon:ToggleShowDebugOutput() then
+        if (KRaidSkipTracker.LibAceAddon:ShouldAlwaysShowAllRaidHeadings() == false) and KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
+            if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
                 print("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
             end
         else
@@ -339,12 +337,12 @@ function KRaidSkipTracker.AddPlayersToTooltip(tooltip, cellRow)
                 hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
             end            
             if players.playerLevel ~= nil then
-                hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(players.playerLevel, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(tostring(players.playerLevel), KRaidSkipTracker.Colors.White))
             else
                 hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
             end
             if players.playerILevel ~= nil then
-                hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(math.floor(players.playerILevel + 0.5), KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(tostring(math.floor(players.playerILevel + 0.5)), KRaidSkipTracker.Colors.White))
             else
                 hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
             end
@@ -380,7 +378,7 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                         if raid.isStatistic then
                             if quest.isCompleted then
                                 tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
-                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNoProgressRaids() then
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() then
                                 -- tooltip:SetCell(cellRow, cellColumn, colorize("Incomplete", KRaidSkipTracker.Colors.Incomplete))
                             end
                         else
@@ -389,7 +387,7 @@ function KRaidSkipTracker.AddAllPlayersProgressToTooltip(tooltip, questId, cellR
                             elseif quest.isStarted then
                                 local questObjectives = quest.objectives
                                 tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
-                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not LibAceAddon:ShouldHideNoProgressRaids() then
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() then
                                 -- tooltip:SetCell(cellRow, cellColumn, colorize("Not Started", KRaidSkipTracker.Colors.Incomplete))
                             end
                         end                    
@@ -432,7 +430,7 @@ function KRaidSkipTracker.UpdateCurrentPlayerData()
                 -- insert the quest data into the raids table
                 table.insert(raidsTable, { isStarted = isStarted, isCompleted = isCompleted, questId = quest.questId, objectives = questObjectives })
 
-                if LibAceAddon:ShouldShowDebugOutput() then
+                if KRaidSkipTracker.LibAceAddon:ShouldShowDebugOutput() then
                     local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
                     local objectivesString = GetCombinedObjectivesString(quest.questId, questObjectives)
                     print(quest.questId .. " | " .. tostring(isStarted) .. " | " .. tostring(isCompleted) .. " | " .. objectivesString)
