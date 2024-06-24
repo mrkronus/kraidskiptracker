@@ -1,11 +1,17 @@
---
--- Addon data initialization
---
+--[[-------------------------------------------------------------------------
+	Addon data initialization
+---------------------------------------------------------------------------]]
+
 local addonName, KRaidSkipTracker = ...
 
---
--- AceAddon initialization
---
+local function GetCurrentDataVersion()
+    return C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "X-Nominal-Version")
+end
+
+--[[-------------------------------------------------------------------------
+	AceAddon initialization
+---------------------------------------------------------------------------]]
+
 local LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3.0", "AceEvent-3.0")
 KRaidSkipTracker.LibAceAddon = LibAceAddon
 
@@ -47,7 +53,7 @@ local aceOptions = {
             width = "full",
             order = 4,
             name = "Show current realm only",
-            desc = "Toggles hiding all characters from realms other than " .. GetRealmName() .. ".",
+            desc = "Toggles hiding all characters from realms other than the current one",
             get = "ShouldShowOnlyCurrentRealm",
             set = "ToggleShowOnlyCurrentRealm",
         },
@@ -132,7 +138,6 @@ function LibAceAddon:ToggleShowDebugOutput(info, value)
     self.db.profile.showDebugOutput = value
 end
 
-playersToShowInOptions = {}
 function LibAceAddon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("KRaidSkipTrackerDB", aceOptionsDefaults, true)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("KRaidSkipTracker", aceOptions, {"kraidskiptracker", "krst"})
@@ -140,7 +145,7 @@ function LibAceAddon:OnInitialize()
 
     KRaidSkipTracker.Initialize()
 
-    self.db.profile.dataVersion = KRaidSkipTracker.GetCurrentDataVersion()
+    self.db.profile.dataVersion = GetCurrentDataVersion()
     self.db.profile.allPlayersData = KRaidSkipTracker.GetAllPlayersData()
 
     aceOptions.args.charactersHeader = {
@@ -150,7 +155,7 @@ function LibAceAddon:OnInitialize()
         name = "Characters",
     }
 
-    playersToShowInOptions = {}
+    local playersToShowInOptions = {}
     local addData = KRaidSkipTracker.GetAllPlayersData()
     for k, v in pairs(addData) do
         playersToShowInOptions[k] = v
@@ -162,7 +167,7 @@ function LibAceAddon:OnInitialize()
         return a.playerName < b.playerName
     end)
 
-    aceOptions.args.deleteAllButton = {
+    aceOptions.args["deleteAllButton"] = {
         type = "execute",
         name = "Delete All Addon Data",
         width = "double",
@@ -174,7 +179,7 @@ function LibAceAddon:OnInitialize()
 
     -- We start at 31 for the worst case scenario of all 
     -- 60 toons being on seperate realms and to leave 
-    -- some for other things afterwards.
+    -- some room for other things afterwards.
     local orderIndex = 31
     for _, player in pairs(playersToShowInOptions) do
         if aceOptions.args[player.playerRealm] == nil then
@@ -193,10 +198,10 @@ function LibAceAddon:OnInitialize()
             name = (player.englishClass ~= nil and (getClassIcon(player.englishClass).." "..colorize(player.playerName, classToColor(player.englishClass))) or player.playerName),
             args = {
                 characterHeader = {
-                type = "header",
-                width = "full",
-                order = 1,
-                name = (player.englishClass ~= nil and (getClassIcon(player.englishClass).." "..colorize(player.playerName, classToColor(player.englishClass))) or player.playerName),
+                    type = "header",
+                    width = "full",
+                    order = 1,
+                    name = (player.englishClass ~= nil and (getClassIcon(player.englishClass).." "..colorize(player.playerName, classToColor(player.englishClass))) or player.playerName),
                 },
                 headerDescription = {
                     type = "description",
@@ -261,27 +266,6 @@ function LibAceAddon:OnInitialize()
             }
         }
 
-        -- local deleteButtonName = "deleteButton".."-"..player.playerName.."-"..player.playerRealm
-        -- aceOptions.args[player.playerRealm].args[deleteButtonName] = {
-        --     type = "execute",
-        --     name = "Delete",
-        --     width = "half",
-        --     order = orderIndex,
-        --     desc = "Are you sure you want to delete instance and raid data for "..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize("This action cannot be undone and will require logging into that character again to get it back.", KRaidSkipTracker.Colors.Red),
-        --     confirm = true,
-        --     func = function() print("DELETE "..player.playerName.." - "..player.playerRealm) end,
-        -- }
-
-        -- local deleteButtonName = "toggleButton".."-"..player.playerName.."-"..player.playerRealm
-        -- aceOptions.args[player.playerRealm].args[deleteButtonName] = {
-        --     type = "execute",
-        --     name = player.shouldShow and "Disable" or "Enable",
-        --     width = "normal",
-        --     order = orderIndex,
-        --     desc = "Toggles visibililty of "..player.playerName.." - "..player.playerRealm.." without deleting the associated data.",
-        --     func = function() print("DELETE "..player.playerName.." - "..player.playerRealm) end,
-        -- }
-
         orderIndex = orderIndex + 1
     end
 end
@@ -300,10 +284,12 @@ function LibAceAddon:GetDBDataVersion()
     return self.db.profile.dataVersion
 end
 
---
--- LibDB initialization
---
-LibQTip = LibStub('LibQTip-1.0')
+--[[-------------------------------------------------------------------------
+	LibDB initialization
+---------------------------------------------------------------------------]]
+
+local LibQTip = LibStub('LibQTip-1.0')
+KRaidSkipTracker.LibQTip = LibQTip
 local LibDataBroker = LibStub("LibDataBroker-1.1")
 
 function tipOnClick(clickedframe, button)
@@ -349,9 +335,10 @@ local function tipOnLeave(self)
     -- Do nothing
 end
 
---
--- LibDBIcon initialization
---
+--[[-------------------------------------------------------------------------
+	LibDBIcon initialization
+---------------------------------------------------------------------------]]
+
 local dataobj = LibDataBroker:NewDataObject("K Keyed", {
     type = "launcher",
     icon = [[Interface/Icons/Inv_misc_key_15]],

@@ -1,7 +1,6 @@
+local addonName, AddonNamespace = ...
 
-local addonName, KRaidSkipTracker = ...
-
-KRaidSkipTracker.Colors = {
+AddonNamespace.Colors = {
     Header       = "FFFFD700",
     SubHeader    = "FFFFFF00",
     Footer       = "FFF5F5F5",
@@ -51,7 +50,7 @@ KRaidSkipTracker.Colors = {
 	Warrior 	 = "FFC79C6E",
 };
 
-KRaidSkipTracker.TextIcons =
+AddonNamespace.TextIcons =
 {
     GreenCheck = '\124A:ui-lfg-readymark-raid:20:20\124a',
     GreenCheckLite = '\124A:UI-LFG-ReadyMark:20:20\124a',
@@ -66,7 +65,7 @@ KRaidSkipTracker.TextIcons =
     Alliance = '\124A:alliance_icon_and_flag-icon:20:20\124a',
 }
 
-KRaidSkipTracker.RaidMarkerValues =
+AddonNamespace.RaidMarkerValues =
 {
     Star = 1,
     Circle = 2,
@@ -78,7 +77,7 @@ KRaidSkipTracker.RaidMarkerValues =
     Skull = 8,
 }
 
-KRaidSkipTracker.RaidIcons =
+AddonNamespace.RaidIcons =
 {
 	Star = "\124A:GM-raidMarker8:20:20\124a",
 	Circle = "\124A:GM-raidMarker7:20:20\124a",
@@ -93,26 +92,26 @@ KRaidSkipTracker.RaidIcons =
 
 --local horde_icon = "|TInterface/Icons/inv_bannerpvp_01:16:16|t";
 --local alliance_icon = "|TInterface/Icons/inv_bannerpvp_02:16:16|t";
-KRaidSkipTracker.FactionIcons =
+AddonNamespace.FactionIcons =
 {
 	["Alliance"] = "\124A:poi-alliance:20:20\124a",
 	["Horde"] = "\124A:poi-horde:20:20\124a"
 }
 
-KRaidSkipTracker.FactionColors =
+AddonNamespace.FactionColors =
 {
-	["Alliance"] = KRaidSkipTracker.Colors.Alliance,
-	["Horde"] = KRaidSkipTracker.Colors.Horde
+	["Alliance"] = AddonNamespace.Colors.Alliance,
+	["Horde"] = AddonNamespace.Colors.Horde
 }
 
-KRaidSkipTracker.RoleIcons = {
+AddonNamespace.RoleIcons = {
 	["TANK"] = "\124A:groupfinder-icon-role-large-tank:20:20\124a",
 	["HEALER"] = "\124A:groupfinder-icon-role-large-heal:20:20\124a",
 	["DAMAGER"] = "\124A:groupfinder-icon-role-large-dps:20:20\124a",
 	["NONE"] = ""
 }
 
-KRaidSkipTracker.Specializations = {
+AddonNamespace.Specializations = {
     -- Mage
     [62] = "Arcane",
     [63] = "Fire",
@@ -179,7 +178,7 @@ KRaidSkipTracker.Specializations = {
     [1473] = "Augmentation"
 }
 
-KRaidSkipTracker.SpecializationToRoleText = {
+AddonNamespace.SpecializationToRoleText = {
 --[[ 
     from
     https://wowpedia.fandom.com/wiki/Specialization
@@ -258,8 +257,8 @@ end
 
 function kprint(string, ...)
     if string ~= nil then
-        if KRaidSkipTracker.LibAceAddon:ShouldShowDebugOutput() then
-            print(colorize("KAutoMark: ", KRaidSkipTracker.Colors.Warlock)..colorize(string, KRaidSkipTracker.Colors.White), ...)
+        if AddonNamespace.LibAceAddon:ShouldShowDebugOutput() then
+            print(colorize("KAutoMark: ", AddonNamespace.Colors.Warlock)..colorize(string, AddonNamespace.Colors.White), ...)
         end
     end
 end
@@ -277,19 +276,19 @@ end
 function classToColor(class)
     local classToColorTable =
     {
-        ["DEATHKNIGHT"] = KRaidSkipTracker.Colors.DeathKnight,
-        ["DEMONHUNTER"] = KRaidSkipTracker.Colors.DemonHunter,
-        ["DRUID"] = KRaidSkipTracker.Colors.Druid,
-        ["EVOKER"] = KRaidSkipTracker.Colors.Evoker,
-        ["HUNTER"] = KRaidSkipTracker.Colors.Hunter,
-        ["MAGE"] = KRaidSkipTracker.Colors.Mage,
-        ["MONK"] = KRaidSkipTracker.Colors.Monk,
-        ["PALADIN"] = KRaidSkipTracker.Colors.Paladin,
-        ["PRIEST"] = KRaidSkipTracker.Colors.Priest,
-        ["ROGUE"] = KRaidSkipTracker.Colors.Rogue,
-        ["SHAMAN"] = KRaidSkipTracker.Colors.Shaman,
-        ["WARLOCK"] = KRaidSkipTracker.Colors.Warlock,
-        ["WARRIOR"] = KRaidSkipTracker.Colors.Warrior,
+        ["DEATHKNIGHT"] = AddonNamespace.Colors.DeathKnight,
+        ["DEMONHUNTER"] = AddonNamespace.Colors.DemonHunter,
+        ["DRUID"] = AddonNamespace.Colors.Druid,
+        ["EVOKER"] = AddonNamespace.Colors.Evoker,
+        ["HUNTER"] = AddonNamespace.Colors.Hunter,
+        ["MAGE"] = AddonNamespace.Colors.Mage,
+        ["MONK"] = AddonNamespace.Colors.Monk,
+        ["PALADIN"] = AddonNamespace.Colors.Paladin,
+        ["PRIEST"] = AddonNamespace.Colors.Priest,
+        ["ROGUE"] = AddonNamespace.Colors.Rogue,
+        ["SHAMAN"] = AddonNamespace.Colors.Shaman,
+        ["WARLOCK"] = AddonNamespace.Colors.Warlock,
+        ["WARRIOR"] = AddonNamespace.Colors.Warrior,
     }
 
     local color = classToColorTable[class]
@@ -297,198 +296,10 @@ function classToColor(class)
         return color
     end
 
-    return KRaidSkipTracker.Colors.Grey
+    return AddonNamespace.Colors.Grey
 end
 
 ---@diagnostic disable-next-line: lowercase-global
 function commaFormatInt(i)
     return tostring(i):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
-end
-
-function GetExpansionFromFromRaidInstanceId(instanceId)
-    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        for _, raid in ipairs(xpac.raids) do
-            if raid.instanceId == instanceId then
-                return xpac.expansionName
-            end
-        end
-    end
-    return "(no instance name)"
-end
-
-function GetRaidInstanceDataFromId(instanceId)
-    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        for _, raid in ipairs(xpac.raids) do
-            if raid.instanceId == instanceId then
-                return raid
-            end
-        end
-    end
-    return "(no instance name)"
-end
-
-function GetRaidInstanceNameFromIdInData(instanceId)
-    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        for _, raid in ipairs(xpac.raids) do
-            if raid.instanceId == instanceId then
-                return raid.instanceName
-            end
-        end
-    end
-    return "(no instance name)"
-end
-
-function GetQuestDisplayNameFromIdInData(questId)
-    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
-        for _, raid in ipairs(xpac.raids) do
-            for _, quest in ipairs(raid.quests) do
-                if quest.questId == questId then
-                    return quest.questName
-                end
-            end
-        end
-    end
-    return "(no quest name)"
-end
-
-function GetCombinedObjectivesString(questId, objectives)
-    local objectivesString = "(none)"
-    if objectives ~= nil then
-        local objectiveIndex = 1
-        for _, objective in ipairs(objectives) do
-            if objective then
-                local numFulfilled, numRequired = GetQuestObjectivesCompleted(questId, objectiveIndex)
-                if objectiveIndex == 1 then
-                    objectivesString = format("%i/%i", numFulfilled, numRequired)
-                else
-                    objectivesString = objectivesString .. format(" | %i/%i", numFulfilled, numRequired)
-                end
-
-                objectiveIndex = objectiveIndex + 1
-            end
-        end
-    end
-    return objectivesString
-end
-
-function GetCombinedObjectivesStringFromData(questId, objectives)
-    local objectivesString = "(none)"
-    if objectives ~= nil then
-        local objectiveIndex = 1
-        for _, objective in ipairs(objectives) do
-            if objective then
-                if objectiveIndex == 1 then
-                    objectivesString = format("%i/%i", objective.numFulfilled, objective.numRequired)
-                else
-                    objectivesString = objectivesString .. format(" | %i/%i", objective.numFulfilled, objective.numRequired)
-                end
-
-                objectiveIndex = objectiveIndex + 1
-            end
-        end
-    end
-    return objectivesString
-end
-
-function IsQuestInLog(questId)
-    if questId ~= nil then
-        local logIndex = C_QuestLog.GetLogIndexForQuestID(questId)
-        if logIndex ~= nil then
-            return true
-        end
-    end
-    return false
-end
-
-function IsQuestComplete(questId)
-    if questId ~= nil then
-        return C_QuestLog.IsQuestFlaggedCompleted(questId)
-    end
-    return false
-end
-
-function IsStatisticComplete(statisticId)
-    if statisticId ~= nil then
-        local statisticValue = GetStatistic(statisticId)
-        if (statisticValue == nil) or (statisticValue == "--") or tonumber(statisticValue) == 0 then
-            return false
-        else
-            return true
-        end
-    end
-    return false
-end
-
-function GetQuestObjectivesCompleted(questId, objectiveIndex)
-    if questId ~= nil then
-        local _, _, _, numFulfilled, numRequired = GetQuestObjectiveInfo(questId, objectiveIndex, false)
-        return numFulfilled, numRequired
-    end
-    return nil
-end
-
-function HasStartedAnyQuestObjective(questId)
-    local objectiveIndex = 1
-    local hasStartedAnyObjective = false
-    local questObjectives = C_QuestLog.GetQuestObjectives(questId)
-    if questObjectives then
-        for _, objective in ipairs(questObjectives) do
-            if objective then
-                local numFulfilled, numRequired = GetQuestObjectivesCompleted(questId, objectiveIndex)
-                if numFulfilled > 0 then
-                    hasStartedAnyObjective = true
-                    break
-                end
-                objectiveIndex = objectiveIndex + 1
-            end
-        end
-    end
-    return hasStartedAnyObjective
-end
-
-function DoesRaidDataHaveAnyProgressOnAnyCharacter(raidId)
-    for _, player in ipairs(PlayersDataToShow) do
-        for _, xpac in ipairs(player.data) do
-            for _, raid in ipairs(xpac) do
-                if raid.instanceId == raidId then
-                    if DoesRaidDataHaveAnyProgress(raid) then
-                        if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                            print(player.playerName .. " has progress on raid " .. raid.instanceId)
-                        end
-                        return true
-                    end
-                end
-            end
-        end
-    end
-    return false
-end
-
-function DoesQuestDataHaveAnyProgressOnAnyCharacter(questId)
-    for _, player in ipairs(PlayersDataToShow) do
-        for _, xpac in ipairs(player.data) do
-            for _, raid in ipairs(xpac) do
-                for _, quest in ipairs(raid.quests) do
-                    if quest.questId == questId then
-                        if quest.isCompleted or quest.isStarted then
-                            if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                                print(player.playerName .. " has progress on quest " .. questId)
-                            end
-                            return true
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return false
-end
-
-function DoesRaidDataHaveAnyProgress(raid)
-    for _, quest in ipairs(raid.quests) do
-        if quest.isCompleted or quest.isStarted then
-            return true
-        end
-    end
-    return false
 end
