@@ -169,12 +169,12 @@ function LibAceAddon:OnInitialize()
 
     aceOptions.args["deleteAllButton"] = {
         type = "execute",
-        name = "Delete All Addon Data",
+        name = "Delete All Stored Character Data",
         width = "double",
         order = 100,
-        desc = "Deletes all players from the stored database.\n\n"..colorize("If you accept, you will need to log into each character again to get the data back.", KRaidSkipTracker.Colors.Red),
+        desc = "Are you sure you want to delete all instance and raid data?\n\n"..colorize("This action cannot be undone and will require you to log into each character again to get the data back.", KRaidSkipTracker.Colors.Red),
         confirm = true,
-        func = function() print("DELETE ALL") end,
+        func = function() KRaidSkipTracker.DeleteAllPlayersData() end,
     }
 
     -- We start at 31 for the worst case scenario of all 
@@ -208,7 +208,7 @@ function LibAceAddon:OnInitialize()
                     width = "double",
                     fontSize = "Large",
                     order = 2,
-                    name = (player.playerLevel ~= nil and "\n" or "Some data is not avaiable, please log into this character to update.\n\n"),
+                    name = (player.playerLevel ~= nil and "\n" or "Some data is not avaiable, please log into this character to refresh the data.\n\n"),
                 },
                 playerRealm = {
                     type = "description",
@@ -252,7 +252,7 @@ function LibAceAddon:OnInitialize()
                     width = "double",
                     desc = "Toggles visibililty of the currently selected character but will not delete the associated data.",
                     order = 50,
-                    func = function() kprint("TOGGLE "..player.playerName.." - "..player.playerRealm) end,
+                    func = function() KRaidSkipTracker.TogglePlayerVisibility(player.playerName, player.playerRealm) end,
                 },
                 deleteButton = {
                     type = "execute",
@@ -261,7 +261,7 @@ function LibAceAddon:OnInitialize()
                     desc = "Are you sure you want to delete instance and raid data for "..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize("This action cannot be undone and will require logging into this character again to get the data back.", KRaidSkipTracker.Colors.Red),
                     confirm = true,
                     order = 51,
-                    func = function() kprint("DELETE "..player.playerName.." - "..player.playerRealm) end,
+                    func = function() KRaidSkipTracker.DeletePlayerData(player.playerName, player.playerRealm) end,
                 }
             }
         }
