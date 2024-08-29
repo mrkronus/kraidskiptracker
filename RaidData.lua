@@ -3,7 +3,7 @@
 --
 local addonName, KRaidSkipTracker = ...
 
-local raidSkipInfoPendingMessage = "Information on how to aquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the quest. "
+local raidSkipInfoPendingMessage = "Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."
 
 -- List of raid IDs, in order 
 -- from https://wowpedia.fandom.com/wiki/InstanceID

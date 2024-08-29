@@ -149,34 +149,34 @@ local function AddAllPlayersProgressToTooltip(tooltip, questId, cellRow)
     local cellColumn = 2 -- first column is for the instance name
     for _, player in ipairs(PlayersDataToShow) do
         if player.shouldShow then
-            for _, xpac in ipairs(player.data) do
-                for _, raid in ipairs(xpac) do
-                    for _, quest in ipairs(raid.quests) do
-                        if quest.questId == questId then
-                            if raid.isStatistic then
-                                if quest.isCompleted then
-                                    tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
-                                elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() then
-                                    -- tooltip:SetCell(cellRow, cellColumn, colorize("Incomplete", KRaidSkipTracker.Colors.Incomplete))
-                                end
-                            else
-                                if quest.isCompleted then
-                                    tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
-                                elseif quest.isStarted then
-                                    local questObjectives = quest.objectives
-                                    tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
-                                elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() then
-                                    -- tooltip:SetCell(cellRow, cellColumn, colorize("Not Started", KRaidSkipTracker.Colors.Incomplete))
-                                end
-                            end                    
-                            tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
-                            cellColumn = cellColumn + 1
-                        end
+        for _, xpac in ipairs(player.data) do
+            for _, raid in ipairs(xpac) do
+                for _, quest in ipairs(raid.quests) do
+                    if quest.questId == questId then
+                        if raid.isStatistic then
+                            if quest.isCompleted then
+                                tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() then
+                                -- tooltip:SetCell(cellRow, cellColumn, colorize("Incomplete", KRaidSkipTracker.Colors.Incomplete))
+                            end
+                        else
+                            if quest.isCompleted then
+                                tooltip:SetCell(cellRow, cellColumn, KRaidSkipTracker.TextIcons.GreenCheck)
+                            elseif quest.isStarted then
+                                local questObjectives = quest.objectives
+                                tooltip:SetCell(cellRow, cellColumn, GetCombinedObjectivesStringFromData(questId, questObjectives))
+                            elseif DoesQuestDataHaveAnyProgressOnAnyCharacter(questId) or not KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() then
+                                -- tooltip:SetCell(cellRow, cellColumn, colorize("Not Started", KRaidSkipTracker.Colors.Incomplete))
+                            end
+                        end                    
+                        tooltip:SetCellScript(cellRow, cellColumn, "OnMouseUp", MouseHandler, function() end)
+                        cellColumn = cellColumn + 1
                     end
                 end
             end
         end
     end
+end
 end
 
 local function AddQuestLineToTooltip(tooltip, raid, quest, shouldHighlight)
@@ -304,47 +304,47 @@ local function AddPlayersToTooltip(tooltip, cellRow)
     for _, player in pairs(PlayersDataToShow) do
         if player.shouldShow then
             tooltip:SetCell(cellRow, cellColumn, colorize(player.playerName .. "\n" .. player.playerRealm, classToColor(player.englishClass)))
-            tooltip:SetCellScript(cellRow, cellColumn, "OnEnter", MouseHandler, function()
-                local hoverTooltip = KRaidSkipTracker.LibQTip:Acquire("KKeyedHoverTooltip", 2, "LEFT", "RIGHT")
-                tooltip.tooltip = hoverTooltip
+        tooltip:SetCellScript(cellRow, cellColumn, "OnEnter", MouseHandler, function()
+            local hoverTooltip = KRaidSkipTracker.LibQTip:Acquire("KKeyedHoverTooltip", 2, "LEFT", "RIGHT")
+            tooltip.tooltip = hoverTooltip
 
-                hoverTooltip:SetFont(InstanceNameTextFont)
+            hoverTooltip:SetFont(InstanceNameTextFont)
 
                 hoverTooltip:AddLine(colorize("Player:", KRaidSkipTracker.Colors.White), colorize(player.playerName, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddLine(colorize("Realm:", KRaidSkipTracker.Colors.White), colorize(player.playerRealm, KRaidSkipTracker.Colors.White))
                 if player.englishClass ~= nil then
                     hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize(player.playerClass, classToColor(player.englishClass)))
-                else
-                    hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
-                end            
+            else
+                hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
+            end            
                 if player.playerLevel ~= nil then
                     hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(tostring(player.playerLevel), KRaidSkipTracker.Colors.White))
-                else
-                    hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
-                end
+            else
+                hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
+            end
                 if player.playerILevel ~= nil then
                     hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(tostring(math.floor(player.playerILevel + 0.5)), KRaidSkipTracker.Colors.White))
-                else
-                    hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
-                end
+            else
+                hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
+            end
                 if player.lastUpdateServerTime ~= nil then
                     hoverTooltip:AddLine(colorize("Last Synced:", KRaidSkipTracker.Colors.White), colorize(date("%m/%d/%y %H:%M:%S", player.lastUpdateServerTime), KRaidSkipTracker.Colors.White))
-                else
-                    hoverTooltip:AddLine(colorize("Last Synced:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
-                end
+            else
+                hoverTooltip:AddLine(colorize("Last Synced:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
+            end
 
-                hoverTooltip:SetAutoHideDelay(0.01, tooltip)
-                hoverTooltip:SmartAnchorTo(tooltip)
-                hoverTooltip:Show()
+            hoverTooltip:SetAutoHideDelay(0.01, tooltip)
+            hoverTooltip:SmartAnchorTo(tooltip)
+            hoverTooltip:Show()
 
-            end)
-            tooltip:SetCellScript(cellRow, cellColumn, "OnLeave", MouseHandler, function()
-                if tooltip.tooltip ~= nil then
-                    tooltip.tooltip:Release()
-                    tooltip.tooltip = nil
-                end
-            end)
-            cellColumn = cellColumn + 1
+        end)
+        tooltip:SetCellScript(cellRow, cellColumn, "OnLeave", MouseHandler, function()
+            if tooltip.tooltip ~= nil then
+                tooltip.tooltip:Release()
+                tooltip.tooltip = nil
+            end
+        end)
+        cellColumn = cellColumn + 1
         end
     end
 end
@@ -482,7 +482,7 @@ KRaidSkipTracker.DeletePlayerData = DeletePlayerData
 local function TogglePlayerVisibility(playerName, playerRealm)    
     local CurrentPlayerIdString = playerName .. " - " .. playerRealm
     if AllPlayersData[CurrentPlayerIdString] ~= nil then
-        AllPlayersData[CurrentPlayerIdString].shouldShow = !AllPlayersData[CurrentPlayerIdString].shouldShow 
+        AllPlayersData[CurrentPlayerIdString].shouldShow = not AllPlayersData[CurrentPlayerIdString].shouldShow
     end
 end
 KRaidSkipTracker.TogglePlayerVisibility = TogglePlayerVisibility

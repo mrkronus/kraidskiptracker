@@ -246,13 +246,16 @@ function LibAceAddon:OnInitialize()
                     order = 49,
                     name = "\n",
                 },
-                enableButton = {
+                toggleButton = {
                     type = "execute",
                     name = player.shouldShow and "Hide" or "Show",
                     width = "double",
                     desc = "Toggles visibililty of the currently selected character but will not delete the associated data.",
                     order = 50,
-                    func = function() KRaidSkipTracker.TogglePlayerVisibility(player.playerName, player.playerRealm) end,
+                    func = function()
+                        KRaidSkipTracker.TogglePlayerVisibility(player.playerName, player.playerRealm)
+                        aceOptions.args[player.playerRealm].args[player.playerName].args["toggleButton"].name = player.shouldShow and "Hide" or "Show"
+                        end,
                 },
                 deleteButton = {
                     type = "execute",
@@ -261,7 +264,10 @@ function LibAceAddon:OnInitialize()
                     desc = "Are you sure you want to delete instance and raid data for "..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize("This action cannot be undone and will require logging into this character again to get the data back.", KRaidSkipTracker.Colors.Red),
                     confirm = true,
                     order = 51,
-                    func = function() KRaidSkipTracker.DeletePlayerData(player.playerName, player.playerRealm) end,
+                    func = function()
+                        KRaidSkipTracker.DeletePlayerData(player.playerName, player.playerRealm)
+                        aceOptions.args[player.playerRealm].args[player.playerName] = nil
+                        end,
                 }
             }
         }
