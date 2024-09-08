@@ -4,7 +4,10 @@ local addonName, KRaidSkipTracker = ...
 	Variables
 ---------------------------------------------------------------------------]]
 
---[[ Player info]]
+-- [[ Localization ]]
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
+--[[ Player info ]]
 local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
 
 --[[ Fonts ]]
@@ -45,7 +48,7 @@ local function ShowKRaidSkipTrackerCopyTextPopup(message, text)
 	local popup = StaticPopupDialogs.KRaidSkipTracker_CopyTextPopup;
 	if not popup then
 		popup = {
-            button1 = "Close",
+            button1 = L["Close"],
             hasEditBox = true,
             editBoxWidth = 300,
             timeout = 0,
@@ -65,7 +68,8 @@ local function ShowKRaidSkipTrackerCopyTextPopup(message, text)
         self.editBox:SetText(text)
         self.editBox:HighlightText()
     end
-    popup.text = message .. "\n\nuse ctrl-c to copy"
+
+    popup.text = message .. "\n\n"..L["Use ctrl-c to copy"]
 	StaticPopup_Hide("KRaidSkipTracker_CopyTextPopup");
 	StaticPopup_Show("KRaidSkipTracker_CopyTextPopup");
 end
