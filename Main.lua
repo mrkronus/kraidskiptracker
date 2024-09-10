@@ -6,6 +6,14 @@ local addonName, KRaidSkipTracker = ...
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+local libIcon = LibStub("LibDBIcon-1.0", true)
+local LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3.0", "AceEvent-3.0")
+local LibQTip = LibStub('LibQTip-1.0')
+local LibDataBroker = LibStub("LibDataBroker-1.1")
+
+KRaidSkipTracker.LibAceAddon = LibAceAddon
+KRaidSkipTracker.LibQTip = LibQTip
+
 local function GetCurrentDataVersion()
     return C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "X-Nominal-Version")
 end
@@ -14,18 +22,24 @@ end
 	AceAddon initialization
 ---------------------------------------------------------------------------]]
 
-local LibAceAddon = LibStub("AceAddon-3.0"):NewAddon("KRaidSkipTracker", "AceConsole-3.0", "AceEvent-3.0")
-KRaidSkipTracker.LibAceAddon = LibAceAddon
-
 local aceOptions = {
     name = "\124TInterface/Icons/inv_misc_key_15:0\124t K Raid Skip Tracker",
     handler = LibAceAddon,
     type = "group",
     args = {
-        alwaysShowAllRaidHeadings = {
+        enableMinimapButton = {
             type = "toggle",
             width = "full",
             order = 1,
+            name = L["Enable minimap button"],
+            desc = "Enables or disables the minimap button.",
+            get = "ShouldShowMinimapButton",
+            set = "ToggleMinimapButton",
+        },
+        alwaysShowAllRaidHeadings = {
+            type = "toggle",
+            width = "full",
+            order = 2,
             name = L["Always show all raid headings"],
             desc = L["Forces all raid headers to awlays be shown, regardless of other settings."],
             get = "ShouldAlwaysShowAllRaidHeadings",
@@ -34,7 +48,7 @@ local aceOptions = {
         hideNoProgressRaids = {
             type = "toggle",
             width = "full",
-            order = 2,
+            order = 3,
             name = L["Hide raid quests with no progress"],
             desc = L["Toggles the display of raids that have have no progression on any shown characters."],
             get = "ShouldHideNoProgressRaids",
@@ -43,7 +57,7 @@ local aceOptions = {
         -- hideNoProgressToons = {
         --     type = "toggle",
         --     width = "full",
-        --     order = 3,
+        --     order = 4,
         --     disabled = true,
         --     name = L["Hide characters with no progress"],
         --     desc = L["Toggles the display of characters that have have no progression on any shown raids."],
@@ -53,7 +67,7 @@ local aceOptions = {
         showOnlyCurrentRealm = {
             type = "toggle",
             width = "full",
-            order = 4,
+            order = 5,
             name = L["Show current realm only"],
             desc = L["Toggles hiding all characters from realms other than the current one"],
             get = "ShouldShowOnlyCurrentRealm",
@@ -83,6 +97,7 @@ local aceOptions = {
 
 local aceOptionsDefaults = {
     profile =  {
+        enableMinimapButton = true,
         hideNoProgressRaids = false,
         hideNoProgressToons = false,
         alwaysShowAllRaidHeadings = false,
@@ -91,6 +106,19 @@ local aceOptionsDefaults = {
         showDebugOutput = false,
     },
 }
+
+function LibAceAddon:ShouldShowMinimapButton(info)
+    return self.db.profile.enableMinimapButton
+end
+
+function LibAceAddon:ToggleMinimapButton(info, value)
+    self.db.profile.enableMinimapButton = value
+    if value then
+        libIcon:Show("K Keyed")
+    else
+        libIcon:Hide("K Keyed")
+    end
+end
 
 function LibAceAddon:ShouldHideNoProgressRaids(info)
     return self.db.profile.hideNoProgressRaids
@@ -150,6 +178,10 @@ function LibAceAddon:OnInitialize()
     self.db.profile.dataVersion = GetCurrentDataVersion()
     self.db.profile.allPlayersData = KRaidSkipTracker.GetAllPlayersData()
 
+    if LibAceAddon:ShouldShowMinimapButton() then
+        libIcon:Show("K Keyed")
+    end
+    
     aceOptions.args.charactersHeader = {
         type = "header",
         width = "full",
@@ -296,10 +328,6 @@ end
 	LibDB initialization
 ---------------------------------------------------------------------------]]
 
-local LibQTip = LibStub('LibQTip-1.0')
-KRaidSkipTracker.LibQTip = LibQTip
-local LibDataBroker = LibStub("LibDataBroker-1.1")
-
 function tipOnClick(clickedframe, button)
     if button == "RightButton" then
         Settings.OpenToCategory("KRaidSkipTracker")
@@ -355,6 +383,4 @@ local dataobj = LibDataBroker:NewDataObject("K Keyed", {
     OnEnter = tipOnEnter
 })
 
-local libIcon = LibStub("LibDBIcon-1.0", true)
 libIcon:Register("K Keyed", dataobj, KKeyedDB)
-libIcon:Show("K Keyed")

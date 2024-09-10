@@ -34,6 +34,8 @@ L["Total Tracked Characters: "] = "Total Tracked Characters: "
 L["Right click icon for options"] = "Right click icon for options"
 
 -- Options
+L["Enable minimap button"] = "Enable minimap button"
+L["Enables or disables the minimap button."] = "Enables or disables the minimap button."
 L["Always show all raid headings"] = "Always show all raid headings"
 L["Forces all raid headers to awlays be shown, regardless of other settings."] = "Forces all raid headers to awlays be shown, regardless of other settings."
 L["Hide raid quests with no progress"] = "Hide raid quests with no progress"
