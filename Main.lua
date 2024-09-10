@@ -4,6 +4,8 @@
 
 local addonName, KRaidSkipTracker = ...
 
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
 local function GetCurrentDataVersion()
     return C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "X-Nominal-Version")
 end
@@ -24,8 +26,8 @@ local aceOptions = {
             type = "toggle",
             width = "full",
             order = 1,
-            name = "Always show all raid headings",
-            desc = "Forces all raid headers to awlays be shown, regardless of other settings.",
+            name = L["Always show all raid headings"],
+            desc = L["Forces all raid headers to awlays be shown, regardless of other settings."],
             get = "ShouldAlwaysShowAllRaidHeadings",
             set = "ToggleAlwaysShowAllRaidHeadings",
         },
@@ -33,27 +35,27 @@ local aceOptions = {
             type = "toggle",
             width = "full",
             order = 2,
-            name = "Hide raid quests with no progress",
-            desc = "Toggles the display of raids that have have no progression on any shown characters.",
+            name = L["Hide raid quests with no progress"],
+            desc = L["Toggles the display of raids that have have no progression on any shown characters."],
             get = "ShouldHideNoProgressRaids",
             set = "ToggleHideNoProgressRaids",
         },
-        hideNoProgressToons = {
-            type = "toggle",
-            width = "full",
-            order = 3,
-            disabled = true,
-            name = "Hide characters with no progress",
-            desc = "Toggles the display of characters that have have no progression on any shown raids.",
-            get = "ShouldHideNoProgressToons",
-            set = "ToggleHideNoProgressToons",
-        },
+        -- hideNoProgressToons = {
+        --     type = "toggle",
+        --     width = "full",
+        --     order = 3,
+        --     disabled = true,
+        --     name = L["Hide characters with no progress"],
+        --     desc = L["Toggles the display of characters that have have no progression on any shown raids."],
+        --     get = "ShouldHideNoProgressToons",
+        --     set = "ToggleHideNoProgressToons",
+        -- },
         showOnlyCurrentRealm = {
             type = "toggle",
             width = "full",
             order = 4,
-            name = "Show current realm only",
-            desc = "Toggles hiding all characters from realms other than the current one",
+            name = L["Show current realm only"],
+            desc = L["Toggles hiding all characters from realms other than the current one"],
             get = "ShouldShowOnlyCurrentRealm",
             set = "ToggleShowOnlyCurrentRealm",
         },
@@ -61,8 +63,8 @@ local aceOptions = {
             type = "toggle",
             width = "full",
             order = 20,
-            name = "Fit window to screen",
-            desc = "Scales the entire window to fit on the screen. Useful if you have many characters and content would otherwise run off the side of the screen.",
+            name = L["Fit window to screen"],
+            desc = L["Scales the entire window to fit on the screen. Useful if you have many characters and content would otherwise run off the side of the screen."],
             get = "ShouldFitToScreen",
             set = "ToggleFitToScreen",
         },
@@ -70,8 +72,8 @@ local aceOptions = {
             type = "toggle",
             width = "full",
             order = 29,
-            name = "Show debug output in chat",
-            desc = "Toggles the display debugging Text in the chat window. "..colorize("Recommended to leave off.", KRaidSkipTracker.Colors.Red),
+            name = L["Show debug output in chat"],
+            desc = L["Toggles the display debugging Text in the chat window. "]..colorize(L["Recommended to leave off."], KRaidSkipTracker.Colors.Red),
             get = "ShouldShowDebugOutput",
             set = "ToggleShowDebugOutput",
             confirm = true
@@ -152,7 +154,7 @@ function LibAceAddon:OnInitialize()
         type = "header",
         width = "full",
         order = 30,
-        name = "Characters",
+        name = L["Characters"],
     }
 
     local playersToShowInOptions = {}
@@ -169,10 +171,10 @@ function LibAceAddon:OnInitialize()
 
     aceOptions.args["deleteAllButton"] = {
         type = "execute",
-        name = "Delete All Stored Character Data",
+        name = L["Delete All Stored Character Data"],
         width = "double",
         order = 100,
-        desc = "Are you sure you want to delete all instance and raid data?\n\n"..colorize("This action cannot be undone and will require you to log into each character again to get the data back.", KRaidSkipTracker.Colors.Red),
+        desc = L["Are you sure you want to delete all instance and raid data?"].."\n\n"..colorize(L["This action cannot be undone and will require you to log into each character again to get the data back."], KRaidSkipTracker.Colors.Red),
         confirm = true,
         func = function() KRaidSkipTracker.DeleteAllPlayersData() end,
     }
@@ -208,37 +210,37 @@ function LibAceAddon:OnInitialize()
                     width = "double",
                     fontSize = "Large",
                     order = 2,
-                    name = (player.playerLevel ~= nil and "\n" or "Some data is not avaiable, please log into this character to refresh the data.\n\n"),
+                    name = (player.playerLevel ~= nil and "\n" or (L["Some data is not avaiable, please log into this character to refresh the data."].."\n\n")),
                 },
                 playerRealm = {
                     type = "description",
                     width = "double",
                     order = 10,
-                    name = "Realm: "..player.playerRealm,
+                    name = L["Realm: "]..player.playerRealm,
                 },
                 playerLevel = {
                     type = "description",
                     width = "double",
                     order = 11,
-                    name = "Level: "..(player.playerLevel ~= nil and player.playerLevel or "(unknown)"),
+                    name = L["Level: "]..(player.playerLevel ~= nil and player.playerLevel or L["(unknown)"]),
                 },
                 playerIlevel = {
                     type = "description",
                     width = "double",
                     order = 12,
-                    name = "iLvl: "..(player.playerILevel ~= nil and math.floor(player.playerILevel + 0.5) or "(unknown)"),
+                    name = L["iLvl: "]..(player.playerILevel ~= nil and math.floor(player.playerILevel + 0.5) or L["(unknown)"]),
                 },
                 playerClass = {
                     type = "description",
                     width = "double",
                     order = 13,
-                    name = function() if player.englishClass ~= nil then return "Class: "..colorize(player.playerClass, classToColor(player.englishClass)) else return "Class: (unknown)" end end,
+                    name = function() if player.englishClass ~= nil then return L["Class: "]..colorize(player.playerClass, classToColor(player.englishClass)) else return L["Class: (unknown)"] end end,
                 },
                 lastSynced = {
                     type = "description",
                     width = "double",
                     order = 14,
-                    name = "Last Synced: "..(player.lastUpdateServerTime ~= nil and date("%m/%d/%y %H:%M:%S", player.lastUpdateServerTime) or "(unknown)"),
+                    name = L["Last Synced: "]..(player.lastUpdateServerTime ~= nil and date(L["%m/%d/%y %H:%M:%S"], player.lastUpdateServerTime) or L["(unknown)"]),
                 },
                 footerDescription = {
                     type = "description",
@@ -248,20 +250,20 @@ function LibAceAddon:OnInitialize()
                 },
                 toggleButton = {
                     type = "execute",
-                    name = player.shouldShow and "Hide" or "Show",
+                    name = player.shouldShow and L["Hide"] or L["Show"],
                     width = "double",
-                    desc = "Toggles visibililty of the currently selected character but will not delete the associated data.",
+                    desc = L["Toggles visibililty of the currently selected character but will not delete the associated data."],
                     order = 50,
                     func = function()
                         KRaidSkipTracker.TogglePlayerVisibility(player.playerName, player.playerRealm)
-                        aceOptions.args[player.playerRealm].args[player.playerName].args["toggleButton"].name = player.shouldShow and "Hide" or "Show"
+                        aceOptions.args[player.playerRealm].args[player.playerName].args["toggleButton"].name = player.shouldShow and L["Hide"] or L["Show"]
                         end,
                 },
                 deleteButton = {
                     type = "execute",
-                    name = "Delete",
+                    name = L["Delete"],
                     width = "half",
-                    desc = "Are you sure you want to delete instance and raid data for "..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize("This action cannot be undone and will require logging into this character again to get the data back.", KRaidSkipTracker.Colors.Red),
+                    desc = L["Are you sure you want to delete instance and raid data for "]..player.playerName.." - "..player.playerRealm.."?\n\n"..colorize(L["This action cannot be undone and will require logging into this character again to get the data back."], KRaidSkipTracker.Colors.Red),
                     confirm = true,
                     order = 51,
                     func = function()

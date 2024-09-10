@@ -200,9 +200,9 @@ local function AddQuestLineToTooltip(tooltip, raid, quest, shouldHighlight)
 
             if not raid.isStatistic then
                 hoverTooltip:AddLine(colorize(C_QuestLog.GetTitleForQuestID(questId), KRaidSkipTracker.Colors.Header))
-                hoverTooltip:AddLine(colorize("Click for Wowhead link", KRaidSkipTracker.Colors.FooterDark))
+                hoverTooltip:AddLine(colorize(L["Click for Wowhead link"], KRaidSkipTracker.Colors.FooterDark))
             else
-                hoverTooltip:AddLine(colorize("This raid skip does not have a quest associated with it.", KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["This raid skip does not have a quest associated with it."], KRaidSkipTracker.Colors.White))
             end
 
             hoverTooltip:SetAutoHideDelay(0.01, tooltip)
@@ -264,14 +264,14 @@ local function AddExpansionToTooltip(tooltip, xpac, cellRow)
                 hoverTooltip:SetCell(hoverY, hoverX, colorize(internalRaidData.instanceDescriptionText, KRaidSkipTracker.Colors.White), nil, "LEFT", 2, nil, nil, nil, 250, nil)
                 hoverTooltip:AddSeparator(6,0,0,0,0)
 
-                hoverTooltip:AddLine(colorize("Expansion: ", KRaidSkipTracker.Colors.White), colorize(GetExpansionFromFromRaidInstanceId(raid.instanceId), KRaidSkipTracker.Colors.White))
-                hoverTooltip:AddLine(colorize("Containing zone: ", KRaidSkipTracker.Colors.White), colorize(C_Map.GetMapInfo(internalRaidData.locatedInZoneId).name, KRaidSkipTracker.Colors.White))
-                hoverTooltip:AddLine(colorize("Required level to enter: ", KRaidSkipTracker.Colors.White), colorize(internalRaidData.requiredLevel, KRaidSkipTracker.Colors.White))
-                hoverTooltip:AddLine(colorize("Number of players: ", KRaidSkipTracker.Colors.White), colorize(internalRaidData.numberOfPlayers, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["Expansion: "], KRaidSkipTracker.Colors.White), colorize(GetExpansionFromFromRaidInstanceId(raid.instanceId), KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["Containing zone: "], KRaidSkipTracker.Colors.White), colorize(C_Map.GetMapInfo(internalRaidData.locatedInZoneId).name, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["Required level to enter: "], KRaidSkipTracker.Colors.White), colorize(internalRaidData.requiredLevel, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["Number of players: "], KRaidSkipTracker.Colors.White), colorize(internalRaidData.numberOfPlayers, KRaidSkipTracker.Colors.White))
                 hoverTooltip:AddSeparator(6,0,0,0,0)
 
                 hoverTooltip:SetFont(FooterTextFont)
-                hoverTooltip:AddLine(colorize("Click to open Adventure Journal", KRaidSkipTracker.Colors.FooterDark))
+                hoverTooltip:AddLine(colorize(L["Click to open Adventure Journal"], KRaidSkipTracker.Colors.FooterDark))
 
                 hoverTooltip:SetAutoHideDelay(0.01, tooltip)
                 hoverTooltip:SmartAnchorTo(tooltip)
@@ -314,27 +314,27 @@ local function AddPlayersToTooltip(tooltip, cellRow)
 
             hoverTooltip:SetFont(InstanceNameTextFont)
 
-                hoverTooltip:AddLine(colorize("Player:", KRaidSkipTracker.Colors.White), colorize(player.playerName, KRaidSkipTracker.Colors.White))
-                hoverTooltip:AddLine(colorize("Realm:", KRaidSkipTracker.Colors.White), colorize(player.playerRealm, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["Player:"], KRaidSkipTracker.Colors.White), colorize(player.playerName, KRaidSkipTracker.Colors.White))
+                hoverTooltip:AddLine(colorize(L["Realm:"], KRaidSkipTracker.Colors.White), colorize(player.playerRealm, KRaidSkipTracker.Colors.White))
                 if player.englishClass ~= nil then
-                    hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize(player.playerClass, classToColor(player.englishClass)))
+                    hoverTooltip:AddLine(colorize(L["Class:"], KRaidSkipTracker.Colors.White), colorize(player.playerClass, classToColor(player.englishClass)))
             else
-                hoverTooltip:AddLine(colorize("Class:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
+                hoverTooltip:AddLine(colorize(L["Class:"], KRaidSkipTracker.Colors.White), colorize(L["Unknown"], KRaidSkipTracker.Colors.Grey))
             end            
                 if player.playerLevel ~= nil then
-                    hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize(tostring(player.playerLevel), KRaidSkipTracker.Colors.White))
+                    hoverTooltip:AddLine(colorize(L["Level:"], KRaidSkipTracker.Colors.White), colorize(tostring(player.playerLevel), KRaidSkipTracker.Colors.White))
             else
-                hoverTooltip:AddLine(colorize("Level:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
+                hoverTooltip:AddLine(colorize(L["Level:"], KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
             end
                 if player.playerILevel ~= nil then
-                    hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize(tostring(math.floor(player.playerILevel + 0.5)), KRaidSkipTracker.Colors.White))
+                    hoverTooltip:AddLine(colorize(L["iLevel:"], KRaidSkipTracker.Colors.White), colorize(tostring(math.floor(player.playerILevel + 0.5)), KRaidSkipTracker.Colors.White))
             else
-                hoverTooltip:AddLine(colorize("iLevel:", KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
+                hoverTooltip:AddLine(colorize(L["iLevel:"], KRaidSkipTracker.Colors.White), colorize("--", KRaidSkipTracker.Colors.Grey))
             end
                 if player.lastUpdateServerTime ~= nil then
-                    hoverTooltip:AddLine(colorize("Last Synced:", KRaidSkipTracker.Colors.White), colorize(date("%m/%d/%y %H:%M:%S", player.lastUpdateServerTime), KRaidSkipTracker.Colors.White))
+                    hoverTooltip:AddLine(colorize(L["Last Synced:"], KRaidSkipTracker.Colors.White), colorize(date(L["%m/%d/%y %H:%M:%S"], player.lastUpdateServerTime), KRaidSkipTracker.Colors.White))
             else
-                hoverTooltip:AddLine(colorize("Last Synced:", KRaidSkipTracker.Colors.White), colorize("Unknown", KRaidSkipTracker.Colors.Grey))
+                hoverTooltip:AddLine(colorize(L["Last Synced:"], KRaidSkipTracker.Colors.White), colorize(L["Unknown"], KRaidSkipTracker.Colors.Grey))
             end
 
             hoverTooltip:SetAutoHideDelay(0.01, tooltip)
@@ -373,8 +373,8 @@ local function PopulateTooltip(tooltip)
         local totalToons =  GetTotalPlayersCountInAllPlayersData();
 
         hoverTooltip:SetFont(InstanceNameTextFont)
-        hoverTooltip:AddLine(colorize("Total Shown Characters: ", KRaidSkipTracker.Colors.White), colorize(tostring(playersCount), KRaidSkipTracker.Colors.White))
-        hoverTooltip:AddLine(colorize("Total Tracked Characters: ", KRaidSkipTracker.Colors.White), colorize(tostring(totalToons), KRaidSkipTracker.Colors.White))
+        hoverTooltip:AddLine(colorize(L["Total Shown Characters: "], KRaidSkipTracker.Colors.White), colorize(tostring(playersCount), KRaidSkipTracker.Colors.White))
+        hoverTooltip:AddLine(colorize(L["Total Tracked Characters: "], KRaidSkipTracker.Colors.White), colorize(tostring(totalToons), KRaidSkipTracker.Colors.White))
         hoverTooltip:AddSeparator()
         hoverTooltip:AddLine(colorize(" ", nil), colorize(C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "Version"), KRaidSkipTracker.Colors.Grey))
 
@@ -399,7 +399,7 @@ local function PopulateTooltip(tooltip)
     end
 
     tooltip:SetFont(FooterTextFont)
-    tooltip:AddLine(colorize("Right click icon for options", KRaidSkipTracker.Colors.FooterDark))
+    tooltip:AddLine(colorize(L["Right click icon for options"], KRaidSkipTracker.Colors.FooterDark))
 end
 KRaidSkipTracker.PopulateTooltip = PopulateTooltip
 
