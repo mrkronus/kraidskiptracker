@@ -19,6 +19,53 @@ local function GetCurrentDataVersion()
 end
 
 --[[-------------------------------------------------------------------------
+	LibDB initialization
+---------------------------------------------------------------------------]]
+
+function tipOnClick(clickedframe, button)
+    if button == "RightButton" then
+        Settings.OpenToCategory("KRaidSkipTracker")
+    end
+end
+
+local function tipOnEnter(self)
+    if self.tooltip then
+        self.tooltip:Release()
+        self.tooltip = nil
+    end
+
+    KRaidSkipTracker.UpdateCurrentPlayerData()
+    local tooltip = LibQTip:Acquire("KKeyedTooltip", 1, "LEFT")
+    self.tooltip = tooltip
+
+    KRaidSkipTracker.PopulateTooltip(tooltip)
+
+	tooltip:SetAutoHideDelay(0.01, self)
+    tooltip:SmartAnchorTo(self)
+
+    if LibAceAddon:ShouldFitToScreen() then
+        local toolTipScale = tooltip:GetScale()
+        local toolTipWidth, toolTipHeight = tooltip:GetSize()
+        local parentWidth, parentHeight = UIParent:GetSize()
+        toolTipWidth = toolTipWidth * toolTipScale
+        toolTipHeight = toolTipHeight * toolTipScale
+        if toolTipWidth > parentWidth or toolTipHeight > parentHeight then
+            toolTipScale = toolTipScale / math.max(toolTipWidth / parentWidth, toolTipHeight / parentHeight)
+            toolTipScale = toolTipScale * 0.95 -- scale it down just a bit more to make it look nicer
+            tooltip:SetScale(toolTipScale)
+        end
+    else
+        tooltip:UpdateScrolling()
+    end
+
+    tooltip:Show()
+end
+
+local function tipOnLeave(self)
+    -- Do nothing
+end
+
+--[[-------------------------------------------------------------------------
 	AceAddon initialization
 ---------------------------------------------------------------------------]]
 
@@ -31,9 +78,9 @@ local aceOptions = {
             type = "toggle",
             width = "full",
             order = 1,
-            name = L["Enable minimap button"],
-            desc = "Enables or disables the minimap button.",
-            get = "ShouldShowMinimapButton",
+            name = L["Hide minimap button"],
+            desc = L["Hides or shows the minimap button."],
+            get = "ShouldHideMinimapButton",
             set = "ToggleMinimapButton",
         },
         alwaysShowAllRaidHeadings = {
@@ -97,7 +144,6 @@ local aceOptions = {
 
 local aceOptionsDefaults = {
     profile =  {
-        enableMinimapButton = true,
         hideNoProgressRaids = false,
         hideNoProgressToons = false,
         alwaysShowAllRaidHeadings = false,
@@ -105,18 +151,26 @@ local aceOptionsDefaults = {
         fitToScreen = true,
         showDebugOutput = false,
     },
+    global = {
+        minimap = {
+            hide = false,
+            lock = false,
+            radius = 90,
+            minimapPos = 200
+        }
+    }
 }
 
-function LibAceAddon:ShouldShowMinimapButton(info)
-    return self.db.profile.enableMinimapButton
+function LibAceAddon:ShouldHideMinimapButton(info)
+    return self.db.global.minimap.hide
 end
 
 function LibAceAddon:ToggleMinimapButton(info, value)
-    self.db.profile.enableMinimapButton = value
+    self.db.global.minimap.hide = value
     if value then
-        libIcon:Show("K Keyed")
-    else
         libIcon:Hide("K Keyed")
+    else
+        libIcon:Show("K Keyed")
     end
 end
 
@@ -178,10 +232,16 @@ function LibAceAddon:OnInitialize()
     self.db.profile.dataVersion = GetCurrentDataVersion()
     self.db.profile.allPlayersData = KRaidSkipTracker.GetAllPlayersData()
 
-    if LibAceAddon:ShouldShowMinimapButton() then
-        libIcon:Show("K Keyed")
-    end
-    
+    local dataobj = LibDataBroker:NewDataObject("K Keyed", {
+        type = "launcher",
+        icon = [[Interface/Icons/Inv_misc_key_15]],
+        OnClick = tipOnClick,
+        OnLeave = tipOnLeave,
+        OnEnter = tipOnEnter
+    })
+
+    libIcon:Register("K Keyed", dataobj, self.db.global.minimap)
+
     aceOptions.args.charactersHeader = {
         type = "header",
         width = "full",
@@ -323,64 +383,3 @@ function LibAceAddon:GetDBDataVersion()
     end
     return self.db.profile.dataVersion
 end
-
---[[-------------------------------------------------------------------------
-	LibDB initialization
----------------------------------------------------------------------------]]
-
-function tipOnClick(clickedframe, button)
-    if button == "RightButton" then
-        Settings.OpenToCategory("KRaidSkipTracker")
-    end
-end
-
-local function tipOnEnter(self)
-    if self.tooltip then
-        self.tooltip:Release()
-        self.tooltip = nil
-    end
-
-    KRaidSkipTracker.UpdateCurrentPlayerData()
-    local tooltip = LibQTip:Acquire("KKeyedTooltip", 1, "LEFT")
-    self.tooltip = tooltip
-
-    KRaidSkipTracker.PopulateTooltip(tooltip)
-
-	tooltip:SetAutoHideDelay(0.01, self)
-    tooltip:SmartAnchorTo(self)
-
-    if LibAceAddon:ShouldFitToScreen() then
-        local toolTipScale = tooltip:GetScale()
-        local toolTipWidth, toolTipHeight = tooltip:GetSize()
-        local parentWidth, parentHeight = UIParent:GetSize()
-        toolTipWidth = toolTipWidth * toolTipScale
-        toolTipHeight = toolTipHeight * toolTipScale
-        if toolTipWidth > parentWidth or toolTipHeight > parentHeight then
-            toolTipScale = toolTipScale / math.max(toolTipWidth / parentWidth, toolTipHeight / parentHeight)
-            toolTipScale = toolTipScale * 0.95 -- scale it down just a bit more to make it look nicer
-            tooltip:SetScale(toolTipScale)
-        end
-    else
-        tooltip:UpdateScrolling()
-    end
-
-    tooltip:Show()
-end
-
-local function tipOnLeave(self)
-    -- Do nothing
-end
-
---[[-------------------------------------------------------------------------
-	LibDBIcon initialization
----------------------------------------------------------------------------]]
-
-local dataobj = LibDataBroker:NewDataObject("K Keyed", {
-    type = "launcher",
-    icon = [[Interface/Icons/Inv_misc_key_15]],
-    OnClick = tipOnClick,
-    OnLeave = tipOnLeave,
-    OnEnter = tipOnEnter
-})
-
-libIcon:Register("K Keyed", dataobj, KKeyedDB)
