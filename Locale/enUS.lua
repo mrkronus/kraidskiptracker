@@ -68,3 +68,5 @@ L["Delete"] = "Delete"
 L["Are you sure you want to delete instance and raid data for "] = "Are you sure you want to delete instance and raid data for "
 L["This action cannot be undone and will require logging into this character again to get the data back."] = "This action cannot be undone and will require logging into this character again to get the data back."
 
+-- Raid data
+L["Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."] = "Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."
