@@ -69,4 +69,17 @@ L["Are you sure you want to delete instance and raid data for "] = "Are you sure
 L["This action cannot be undone and will require logging into this character again to get the data back."] = "This action cannot be undone and will require logging into this character again to get the data back."
 
 -- Raid data
-L["Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."] = "Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."
+L["DEFAULT_DESCRIPTION_TEXT"] = "Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."
+L["Normal"] = "Normal"
+L["Heroic"] = "Heroic"
+L["Mythic"] = "Mythic"
+
+L["WOD_BRF_INSTANCE_NAME"] = "WOD: Blackrock Foundry"
+L["WOD_BRF_INSTANCE_SHORT_NAME"] = "Blackrock Foundry"
+L["WOD_BRF_DESCRIPTION_TEXT"] = "Starting NPC:\nAfter defeating The Iron Maidens (about halfway through the raid), a hidden path to the east through some cargo boxes becomes available. At the end of the winding path, Goraluk Anvilcrack can be found and will give the quest Sigil of the Black Hand.\n\nUsing the Skip:\nIf anyone in the raid has the skip, two large stones on either side of the entrance to Blackhand become usable. Interacting with them allows the raid to skip all other bosses.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels."
+
+L["WOD_HFC_INSTANCE_NAME"] = "WOD: Hellfire Citadel"
+L["WOD_HFC_INSTANCE_SHORT_NAME"] = "Hellfire Citadel"
+L["WOD_HFC_DESCRIPTION_TEXT"] = "Starting NPC:\nThere are two quests to fully unlock the skip. One for the first half, and one for the second half. Khadgar (available in multiple places in the instance) gives both, the first after killing the 2nd boss, Iron Reaver. Completing the first quest allows access to the second.\n\nUsing the Skip:\nIf anyone in the raid has either skip quest completed, a special portal will appear on the south wall, near the entrace to the raid, after all the NPCs spawn in.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels."
+L["Upper Citadel"] = "Upper Citadel"
+L["Destructor's Rise"] = "Destructor's Rise"

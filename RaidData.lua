@@ -6,8 +6,6 @@ local addonName, KRaidSkipTracker = ...
 -- [[ Localization ]]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-local raidSkipInfoPendingMessage = L["Information on how to acquire and use this skip will be added in a future update. In the meantime, please check the wowhead link by clicking on the appropriate quest below this heading."]
-
 -- List of raid IDs, in order 
 -- from https://wowpedia.fandom.com/wiki/InstanceID
 local RaidOrder =
@@ -40,30 +38,30 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- WOD: Blackrock Foundry
             {
-                instanceName = "WOD: Blackrock Foundry", instanceShortName = "Blackrock Foundry", instanceId = 1205, journalInstanceId = 457, isStatistic = false,
+                instanceName = L["WOD_BRF_INSTANCE_NAME"], instanceShortName = L["WOD_BRF_INSTANCE_SHORT_NAME"], instanceId = 1205, journalInstanceId = 457, isStatistic = false,
                 requiredLevel = "40", numberOfPlayers = "10/30", locatedInZoneId = 543, -- Gorgrond 
-                instanceDescriptionText = "Starting NPC:\nAfter defeating The Iron Maidens (about halfway through the raid), a hidden path to the east through some cargo boxes becomes available. At the end of the winding path, Goraluk Anvilcrack can be found and will give the quest Sigil of the Black Hand.\n\nUsing the Skip:\nIf anyone in the raid has the skip, two large stones on either side of the entrance to Blackhand become usable. Interacting with them allows the raid to skip all other bosses.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels.",
+                instanceDescriptionText = L["WOD_BRF_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 37029 },
-                    { questName = "Heroic", questId = 37030 },
-                    { questName = "Mythic", questId = 37031 }
+                    { questName = L["Normal"], questId = 37030 },
+                    { questName = L["Heroic"], questId = 37031 },
+                    { questName = L["Mythic"], questId = 37029 },
                 }
             },
 
             -- WOD: Hellfire Citadel
             {
-                instanceName = "WOD: Hellfire Citadel", instanceShortName = "Hellfire Citadel", instanceId = 1448, journalInstanceId = 669, isStatistic = false,
+                instanceName = L["WOD_HFC_INSTANCE_NAME"], instanceShortName = L["WOD_HFC_INSTANCE_SHORT_NAME"], instanceId = 1448, journalInstanceId = 669, isStatistic = false,
                 requiredLevel = "40", numberOfPlayers = "10/30", locatedInZoneId = 534, -- Tanaan Jungle
-                instanceDescriptionText = "Starting NPC:\nThere are two quests to fully unlock the skip. One for the first half, and one for the second half. Khadgar (available in multiple places in the instance) gives both, the first after killing the 2nd boss, Iron Reaver. Completing the first quest allows access to the second.\n\nUsing the Skip:\nIf anyone in the raid has either skip quest completed, a special portal will appear on the south wall, near the entrace to the raid, after all the NPCs spawn in.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels.",
+                instanceDescriptionText = L["WOD_HFC_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal Upper Citadel", questId = 39499 },
-                    { questName = "Heroic Upper Citadel", questId = 39500 },
-                    { questName = "Mythic Upper Citadel", questId = 39501 },
-                    { questName = "Normal Destructor's Rise", questId = 39502 },
-                    { questName = "Heroic Destructor's Rise", questId = 39504 },
-                    { questName = "Mythic Destructor's Rise", questId = 39505 }
+                    { questName = L["Normal"].." "..L["Upper Citadel"], questId = 39499 },
+                    { questName = L["Heroic"].." "..L["Upper Citadel"], questId = 39500 },
+                    { questName = L["Mythic"].." "..L["Upper Citadel"], questId = 39501 },
+                    { questName = L["Normal"].." "..L["Destructor's Rise"], questId = 39502 },
+                    { questName = L["Heroic"].." "..L["Destructor's Rise"], questId = 39504 },
+                    { questName = L["Mythic"].." "..L["Destructor's Rise"], questId = 39505 }
                 },
             },
         }
@@ -76,12 +74,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "Legion: The Emerald Nightmare", instanceShortName = "The Emerald Nightmare", instanceId = 1520, journalInstanceId = 768, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 641, -- Val'sharah
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 44283 },
-                    { questName = "Heroic", questId = 44284 },
-                    { questName = "Mythic", questId = 44285 }
+                    { questName = L["Normal"], questId = 44283 },
+                    { questName = L["Heroic"], questId = 44284 },
+                    { questName = L["Mythic"], questId = 44285 }
                 }
             },
 
@@ -89,12 +87,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "Legion: The Nighthold", instanceShortName = "The Nighthold", instanceId = 1530, journalInstanceId = 786, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 680, -- Suramar 
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 45381 },
-                    { questName = "Heroic", questId = 45382 },
-                    { questName = "Mythic", questId = 45383 }
+                    { questName = L["Normal"], questId = 45381 },
+                    { questName = L["Heroic"], questId = 45382 },
+                    { questName = L["Mythic"], questId = 45383 }
                 }
             },
 
@@ -102,12 +100,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "Legion: Tomb of Sargeras", instanceShortName = "Tomb of Sargeras", instanceId = 1676, journalInstanceId = 875, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 646, -- The Broken Shore 
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 47725 },
-                    { questName = "Heroic", questId = 47726 },
-                    { questName = "Mythic", questId = 47727 }
+                    { questName = L["Normal"], questId = 47725 },
+                    { questName = L["Heroic"], questId = 47726 },
+                    { questName = L["Mythic"], questId = 47727 }
                 }
             },
 
@@ -115,15 +113,15 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "Legion: Antorus, the Burning Throne", instanceShortName = "Antorus, the Burning Throne", instanceId = 1712, journalInstanceId = 946, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 885, -- Argus: Antoran Wastes
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal Imonar", questId = 49032 },
-                    { questName = "Heroic Imonar", questId = 49075 },
-                    { questName = "Mythic Imonar", questId = 49076 },
-                    { questName = "Heroic Aggramar", questId = 49134 },
-                    { questName = "Normal Aggramar", questId = 49133 },
-                    { questName = "Mythic Aggramar", questId = 49135 }
+                    { questName = L["Normal"].." ".."Imonar", questId = 49032 },
+                    { questName = L["Heroic"].." ".."Imonar", questId = 49075 },
+                    { questName = L["Mythic"].." ".."Imonar", questId = 49076 },
+                    { questName = L["Normal"].." ".."Aggramar", questId = 49134 },
+                    { questName = L["Heroic"].." ".."Aggramar", questId = 49133 },
+                    { questName = L["Mythic"].." ".."Aggramar", questId = 49135 }
                 },
             },
         }
@@ -136,12 +134,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "BFA: Ny'alotha, the Waking City", instanceShortName = "Ny'alotha, the Waking City", instanceId = 2217, journalInstanceId = 1180, isStatistic = false,
                 requiredLevel = "50", numberOfPlayers = "10/30", locatedInZoneId = 1527, -- Uldum
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 58373 },
-                    { questName = "Heroic", questId = 58374 },
-                    { questName = "Mythic", questId = 58375 }
+                    { questName = L["Normal"], questId = 58373 },
+                    { questName = L["Heroic"], questId = 58374 },
+                    { questName = L["Mythic"], questId = 58375 }
                 }
             },
 
@@ -149,10 +147,10 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "BFA: Battle of Dazar'alor", instanceShortName = "Battle of Dazar'alor", instanceId = 2070, journalInstanceId = 1176, isStatistic = true,
                 requiredLevel = "50", numberOfPlayers = "10/30", locatedInZoneId = 862, -- Zuldazar 
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Mythic", questId = 13382 }
+                    { questName = L["Mythic"], questId = 13382 }
                 }
             },
         }
@@ -165,36 +163,36 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "SL: Castle Nathria", instanceShortName = "Castle Nathria", instanceId = 2296, journalInstanceId = 1190, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1525, -- Revendreth
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 62054 },
-                    { questName = "Heroic", questId = 62055 },
-                    { questName = "Mythic", questId = 62056 }
+                    { questName = L["Normal"], questId = 62054 },
+                    { questName = L["Heroic"], questId = 62055 },
+                    { questName = L["Mythic"], questId = 62056 }
                 }
             },
             -- SL: Sanctum of Domination
             {
                 instanceName = "SL: Sanctum of Domination", instanceShortName = "Sanctum of Domination", instanceId = 2450, journalInstanceId = 1193, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1543, -- The Maw
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 64597 },
-                    { questName = "Heroic", questId = 64598 },
-                    { questName = "Mythic", questId = 64599 }
+                    { questName = L["Normal"], questId = 64597 },
+                    { questName = L["Heroic"], questId = 64598 },
+                    { questName = L["Mythic"], questId = 64599 }
                 }
             },
             -- SL: Sepulcher of the First Ones
             {
                 instanceName = "SL: Sepulcher of the First Ones", instanceShortName = "Sepulcher of the First Ones", instanceId = 2481, journalInstanceId = 1195, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1970, -- Zereth Mortis
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 65764 },
-                    { questName = "Heroic", questId = 65763 },
-                    { questName = "Mythic", questId = 65762 }
+                    { questName = L["Normal"], questId = 65764 },
+                    { questName = L["Heroic"], questId = 65763 },
+                    { questName = L["Mythic"], questId = 65762 }
                 }
             },
         }
@@ -207,12 +205,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "DF: Vault of the Incarnates", instanceShortName = "Vault of the Incarnates", instanceId = 2522, journalInstanceId = 1200, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2025, -- Thaldraszus
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 71018 },
-                    { questName = "Heroic", questId = 71019 },
-                    { questName = "Mythic", questId = 71020 }
+                    { questName = L["Normal"], questId = 71018 },
+                    { questName = L["Heroic"], questId = 71019 },
+                    { questName = L["Mythic"], questId = 71020 }
                 }
             },
 
@@ -220,12 +218,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "DF: Aberrus, the Shadowed Crucible", instanceShortName = "Aberrus, the Shadowed Crucible", instanceId = 2569, journalInstanceId = 1208, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2133, -- Zarelek Cavern
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 76083 },
-                    { questName = "Heroic", questId = 76085 },
-                    { questName = "Mythic", questId = 76086 }
+                    { questName = L["Normal"], questId = 76083 },
+                    { questName = L["Heroic"], questId = 76085 },
+                    { questName = L["Mythic"], questId = 76086 }
                 }
             },
 
@@ -233,12 +231,12 @@ KRaidSkipTracker.questDataByExpansion =
             {
                 instanceName = "DF: Amirdrassil, the Dream's Hope", instanceShortName = "Amirdrassil, the Dream's Hope", instanceId = 2549, journalInstanceId = 1207, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2200, -- Emerald Dream
-                instanceDescriptionText = raidSkipInfoPendingMessage,
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = "Normal", questId = 78600 },
-                    { questName = "Heroic", questId = 78601 },
-                    { questName = "Mythic", questId = 78602 }
+                    { questName = L["Normal"], questId = 78600 },
+                    { questName = L["Heroic"], questId = 78601 },
+                    { questName = L["Mythic"], questId = 78602 }
                 }
             },
         }
