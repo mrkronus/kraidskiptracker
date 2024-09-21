@@ -72,7 +72,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- Legion: The Emerald Nightmare
             {
-                instanceName = "Legion: The Emerald Nightmare", instanceShortName = "The Emerald Nightmare", instanceId = 1520, journalInstanceId = 768, isStatistic = false,
+                instanceName = L["LEG_EN_INSTANCE_NAME"], instanceShortName = L["LEG_EN_INSTANCE_SHORT_NAME"], instanceId = 1520, journalInstanceId = 768, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 641, -- Val'sharah
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -85,7 +85,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- Legion: The Nighthold
             {
-                instanceName = "Legion: The Nighthold", instanceShortName = "The Nighthold", instanceId = 1530, journalInstanceId = 786, isStatistic = false,
+                instanceName = L["LEG_NIGHT_INSTANCE_NAME"], instanceShortName = L["LEG_NIGHT_INSTANCE_SHORT_NAME"], instanceId = 1530, journalInstanceId = 786, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 680, -- Suramar 
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -98,7 +98,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- Legion: Tomb of Sargeras
             {
-                instanceName = "Legion: Tomb of Sargeras", instanceShortName = "Tomb of Sargeras", instanceId = 1676, journalInstanceId = 875, isStatistic = false,
+                instanceName = L["LEG_TOS_INSTANCE_NAME"], instanceShortName = L["LEG_TOS_INSTANCE_SHORT_NAME"], instanceId = 1676, journalInstanceId = 875, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 646, -- The Broken Shore 
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -111,17 +111,17 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- Legion: Antorus, the Burning Throne
             {
-                instanceName = "Legion: Antorus, the Burning Throne", instanceShortName = "Antorus, the Burning Throne", instanceId = 1712, journalInstanceId = 946, isStatistic = false,
+                instanceName = L["LEG_ANT_INSTANCE_NAME"], instanceShortName = L["LEG_ANT_INSTANCE_SHORT_NAME"], instanceId = 1712, journalInstanceId = 946, isStatistic = false,
                 requiredLevel = "45", numberOfPlayers = "10/30", locatedInZoneId = 885, -- Argus: Antoran Wastes
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = L["Normal"].." ".."Imonar", questId = 49032 },
-                    { questName = L["Heroic"].." ".."Imonar", questId = 49075 },
-                    { questName = L["Mythic"].." ".."Imonar", questId = 49076 },
-                    { questName = L["Normal"].." ".."Aggramar", questId = 49134 },
-                    { questName = L["Heroic"].." ".."Aggramar", questId = 49133 },
-                    { questName = L["Mythic"].." ".."Aggramar", questId = 49135 }
+                    { questName = L["Normal"].." "..L["Imonar"], questId = 49032 },
+                    { questName = L["Heroic"].." "..L["Imonar"], questId = 49075 },
+                    { questName = L["Mythic"].." "..L["Imonar"], questId = 49076 },
+                    { questName = L["Normal"].." "..L["Aggramar"], questId = 49134 },
+                    { questName = L["Heroic"].." "..L["Aggramar"], questId = 49133 },
+                    { questName = L["Mythic"].." "..L["Aggramar"], questId = 49135 }
                 },
             },
         }
@@ -132,7 +132,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- BFA: Ny'alotha, the Waking City
             {
-                instanceName = "BFA: Ny'alotha, the Waking City", instanceShortName = "Ny'alotha, the Waking City", instanceId = 2217, journalInstanceId = 1180, isStatistic = false,
+                instanceName = L["BFA_NTWC_INSTANCE_NAME"], instanceShortName = L["BFA_NTWC_INSTANCE_SHORT_NAME"], instanceId = 2217, journalInstanceId = 1180, isStatistic = false,
                 requiredLevel = "50", numberOfPlayers = "10/30", locatedInZoneId = 1527, -- Uldum
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -145,7 +145,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- BFA: Battle of Dazar'alor
             {
-                instanceName = "BFA: Battle of Dazar'alor", instanceShortName = "Battle of Dazar'alor", instanceId = 2070, journalInstanceId = 1176, isStatistic = true,
+                instanceName = L["BFA_BD_INSTANCE_NAME"], instanceShortName = L["BFA_BD_INSTANCE_SHORT_NAME"], instanceId = 2070, journalInstanceId = 1176, isStatistic = true,
                 requiredLevel = "50", numberOfPlayers = "10/30", locatedInZoneId = 862, -- Zuldazar 
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -161,7 +161,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- SL: Castle Nathria
             {
-                instanceName = "SL: Castle Nathria", instanceShortName = "Castle Nathria", instanceId = 2296, journalInstanceId = 1190, isStatistic = false,
+                instanceName = L["SL_CN_INSTANCE_NAME"], instanceShortName = L["SL_CN_INSTANCE_SHORT_NAME"], instanceId = 2296, journalInstanceId = 1190, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1525, -- Revendreth
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -173,7 +173,7 @@ KRaidSkipTracker.questDataByExpansion =
             },
             -- SL: Sanctum of Domination
             {
-                instanceName = "SL: Sanctum of Domination", instanceShortName = "Sanctum of Domination", instanceId = 2450, journalInstanceId = 1193, isStatistic = false,
+                instanceName = L["SL_SOD_INSTANCE_NAME"], instanceShortName = L["SL_SOD_INSTANCE_SHORT_NAME"], instanceId = 2450, journalInstanceId = 1193, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1543, -- The Maw
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -185,7 +185,7 @@ KRaidSkipTracker.questDataByExpansion =
             },
             -- SL: Sepulcher of the First Ones
             {
-                instanceName = "SL: Sepulcher of the First Ones", instanceShortName = "Sepulcher of the First Ones", instanceId = 2481, journalInstanceId = 1195, isStatistic = false,
+                instanceName = L["SL_SFO_INSTANCE_NAME"], instanceShortName = L["SL_SFO_INSTANCE_SHORT_NAME"], instanceId = 2481, journalInstanceId = 1195, isStatistic = false,
                 requiredLevel = "60", numberOfPlayers = "10/30", locatedInZoneId = 1970, -- Zereth Mortis
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -203,7 +203,7 @@ KRaidSkipTracker.questDataByExpansion =
         {
             -- DF: Vault of the Incarnates
             {
-                instanceName = "DF: Vault of the Incarnates", instanceShortName = "Vault of the Incarnates", instanceId = 2522, journalInstanceId = 1200, isStatistic = false,
+                instanceName = L["DF_VOI_INSTANCE_NAME"], instanceShortName = L["DF_VOI_INSTANCE_SHORT_NAME"], instanceId = 2522, journalInstanceId = 1200, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2025, -- Thaldraszus
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -216,7 +216,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- DF: Aberrus, the Shadowed Crucible
             {
-                instanceName = "DF: Aberrus, the Shadowed Crucible", instanceShortName = "Aberrus, the Shadowed Crucible", instanceId = 2569, journalInstanceId = 1208, isStatistic = false,
+                instanceName = L["DF_ASC_INSTANCE_NAME"], instanceShortName = L["DF_ASC_INSTANCE_SHORT_NAME"], instanceId = 2569, journalInstanceId = 1208, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2133, -- Zarelek Cavern
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -229,7 +229,7 @@ KRaidSkipTracker.questDataByExpansion =
 
             -- DF: Amirdrassil, the Dream's Hope
             {
-                instanceName = "DF: Amirdrassil, the Dream's Hope", instanceShortName = "Amirdrassil, the Dream's Hope", instanceId = 2549, journalInstanceId = 1207, isStatistic = false,
+                instanceName = L["DF_ADH_INSTANCE_NAME"], instanceShortName = L["DF_ADH_INSTANCE_SHORT_NAME"], instanceId = 2549, journalInstanceId = 1207, isStatistic = false,
                 requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2200, -- Emerald Dream
                 instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
                 quests =
@@ -251,7 +251,7 @@ function GetExpansionFromFromRaidInstanceId(instanceId)
             end
         end
     end
-    return "(no instance name)"
+    return L["(no instance name)"]
 end
 
 function GetRaidInstanceDataFromId(instanceId)
@@ -262,7 +262,7 @@ function GetRaidInstanceDataFromId(instanceId)
             end
         end
     end
-    return "(no instance name)"
+    return L["(no instance name)"]
 end
 
 function GetRaidInstanceNameFromIdInData(instanceId)
@@ -273,7 +273,7 @@ function GetRaidInstanceNameFromIdInData(instanceId)
             end
         end
     end
-    return "(no instance name)"
+    return L["(no instance name)"]
 end
 
 function GetQuestDisplayNameFromIdInData(questId)
@@ -286,11 +286,11 @@ function GetQuestDisplayNameFromIdInData(questId)
             end
         end
     end
-    return "(no quest name)"
+    return L["(no quest name)"]
 end
 
 function GetCombinedObjectivesString(questId, objectives)
-    local objectivesString = "(none)"
+    local objectivesString = L["(none)"]
     if objectives ~= nil then
         local objectiveIndex = 1
         for _, objective in ipairs(objectives) do
@@ -310,7 +310,7 @@ function GetCombinedObjectivesString(questId, objectives)
 end
 
 function GetCombinedObjectivesStringFromData(questId, objectives)
-    local objectivesString = "(none)"
+    local objectivesString = L["(none)"]
     if objectives ~= nil then
         local objectiveIndex = 1
         for _, objective in ipairs(objectives) do
@@ -391,7 +391,7 @@ function DoesRaidDataHaveAnyProgressOnAnyCharacter(raidId)
                 if raid.instanceId == raidId then
                     if DoesRaidDataHaveAnyProgress(raid) then
                         if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                            print(player.playerName .. " has progress on raid " .. raid.instanceId)
+                            print(player.playerName .. L["has progress on quest"] .. raid.instanceId)
                         end
                         return true
                     end
@@ -410,7 +410,7 @@ function DoesQuestDataHaveAnyProgressOnAnyCharacter(questId)
                     if quest.questId == questId then
                         if quest.isCompleted or quest.isStarted then
                             if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                                print(player.playerName .. " has progress on quest " .. questId)
+                                print(player.playerName .. L["has progress on quest"] .. questId)
                             end
                             return true
                         end

@@ -74,6 +74,11 @@ L["Normal"] = "Normal"
 L["Heroic"] = "Heroic"
 L["Mythic"] = "Mythic"
 
+L["(no instance name)"] = "(no instance name)"
+L["(no quest name)"] = "(no quest name)"
+L["(none)"] = "(none)"
+L["has progress on quest"] = " has progress on quest "
+
 L["WOD_BRF_INSTANCE_NAME"] = "WOD: Blackrock Foundry"
 L["WOD_BRF_INSTANCE_SHORT_NAME"] = "Blackrock Foundry"
 L["WOD_BRF_DESCRIPTION_TEXT"] = "Starting NPC:\nAfter defeating The Iron Maidens (about halfway through the raid), a hidden path to the east through some cargo boxes becomes available. At the end of the winding path, Goraluk Anvilcrack can be found and will give the quest Sigil of the Black Hand.\n\nUsing the Skip:\nIf anyone in the raid has the skip, two large stones on either side of the entrance to Blackhand become usable. Interacting with them allows the raid to skip all other bosses.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels."
@@ -83,3 +88,41 @@ L["WOD_HFC_INSTANCE_SHORT_NAME"] = "Hellfire Citadel"
 L["WOD_HFC_DESCRIPTION_TEXT"] = "Starting NPC:\nThere are two quests to fully unlock the skip. One for the first half, and one for the second half. Khadgar (available in multiple places in the instance) gives both, the first after killing the 2nd boss, Iron Reaver. Completing the first quest allows access to the second.\n\nUsing the Skip:\nIf anyone in the raid has either skip quest completed, a special portal will appear on the south wall, near the entrace to the raid, after all the NPCs spawn in.\n\nAcquiring the mythic skip unlocks the skip for all difficulty levels."
 L["Upper Citadel"] = "Upper Citadel"
 L["Destructor's Rise"] = "Destructor's Rise"
+
+L["LEG_EN_INSTANCE_NAME"] = "Legion: The Emerald Nightmare"
+L["LEG_EN_INSTANCE_SHORT_NAME"] = "The Emerald Nightmare"
+
+L["LEG_NIGHT_INSTANCE_NAME"] = "Legion: The Nighthold"
+L["LEG_NIGHT_INSTANCE_SHORT_NAME"] = "The Nighthold"
+
+L["LEG_TOS_INSTANCE_NAME"] = "Legion: Tomb of Sargeras"
+L["LEG_TOS_INSTANCE_SHORT_NAME"] = "Tomb of Sargeras"
+
+L["LEG_ANT_INSTANCE_NAME"] = "Legion: Antorus, the Burning Throne"
+L["LEG_ANT_INSTANCE_SHORT_NAME"] = "Antorus, the Burning Throne"
+L["Imonar"] = "Imonar"
+L["Aggramar"] = "Aggramar"
+
+L["BFA_NTWC_INSTANCE_NAME"] = "BFA: Ny'alotha, the Waking City"
+L["BFA_NTWC_INSTANCE_SHORT_NAME"] = "Ny'alotha, the Waking City"
+
+L["BFA_BD_INSTANCE_NAME"] = "BFA: Battle of Dazar'alor"
+L["BFA_BD_INSTANCE_SHORT_NAME"] = "Battle of Dazar'alor"
+
+L["SL_CN_INSTANCE_NAME"] = "SL: Castle Nathria"
+L["SL_CN_INSTANCE_SHORT_NAME"] = "Castle Nathria"
+
+L["SL_SOD_INSTANCE_NAME"] = "SL: Sanctum of Domination"
+L["SL_SOD_INSTANCE_SHORT_NAME"] = "Sanctum of Domination"
+
+L["SL_SFO_INSTANCE_NAME"] = "SL: Sepulcher of the First Ones"
+L["SL_SFO_INSTANCE_SHORT_NAME"] = "Sepulcher of the First Ones"
+
+L["DF_VOI_INSTANCE_NAME"] = "DF: Vault of the Incarnates"
+L["DF_VOI_INSTANCE_SHORT_NAME"] = "Vault of the Incarnates"
+
+L["DF_ASC_INSTANCE_NAME"] = "DF: Aberrus, the Shadowed Crucible"
+L["DF_ASC_INSTANCE_SHORT_NAME"] = "Aberrus, the Shadowed Crucible"
+
+L["DF_ADH_INSTANCE_NAME"] = "DF: Amirdrassil, the Dream's Hope"
+L["DF_ADH_INSTANCE_SHORT_NAME"] = "Amirdrassil, the Dream's Hope"
