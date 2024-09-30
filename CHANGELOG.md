@@ -3,7 +3,7 @@
 
 
 ### Version 11.0.2.14 Beta
-- Removed unused option
+- Removed an unused option
 - Added an option to show/hide minimap icon
 - Minimap icon position is now global to account and not per-character
 - Added support for localizing strings (no new localization has been added yet)
