@@ -1,4 +1,4 @@
-### Version 11.0.2.15 Beta
+### Version 11.0.2.16 Beta
 - Adding localized strings for German locale
 
 
