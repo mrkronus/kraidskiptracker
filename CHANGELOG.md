@@ -1,3 +1,7 @@
+### Version 11.0.2.15 Beta
+- Adding localized strings for German locale
+
+
 ### Version 11.0.2.14 Beta
 - Removed unused option
 - Added an option to show/hide minimap icon
