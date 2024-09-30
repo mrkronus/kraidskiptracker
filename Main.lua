@@ -97,7 +97,7 @@ local aceOptions = {
             width = "full",
             order = 3,
             name = L["Hide raid quests with no progress"],
-            desc = L["Toggles the display of raids that have have no progression on any shown characters."],
+            desc = L["Toggles the display of raids that have no progression on any shown characters."],
             get = "ShouldHideNoProgressRaids",
             set = "ToggleHideNoProgressRaids",
         },
