@@ -100,10 +100,6 @@ local function LoadData()
     AllPlayersData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData()
 end
 
-local function ClearData()
-    AllPlayersData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData()
-end
-
 local function UpdateSortedPlayersData()
     PlayersDataToShow = {}
     local insertLocation = 1
@@ -472,6 +468,7 @@ KRaidSkipTracker.GetAllPlayersData = GetAllPlayersData
 
 local function DeleteAllPlayersData()
     AllPlayersData = nil
+    AllPlayersData = {}
 end
 KRaidSkipTracker.DeleteAllPlayersData = DeleteAllPlayersData
 
