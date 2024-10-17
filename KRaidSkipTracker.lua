@@ -468,7 +468,6 @@ KRaidSkipTracker.GetAllPlayersData = GetAllPlayersData
 
 local function DeleteAllPlayersData()
     AllPlayersData = nil
-    AllPlayersData = {}
 end
 KRaidSkipTracker.DeleteAllPlayersData = DeleteAllPlayersData
 
