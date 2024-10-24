@@ -1,14 +1,14 @@
-﻿## Interface: 110002
+﻿## Interface: 110005
 ## Title: KRaidSkipTracker
 ## IconTexture: Interface\Icons\inv_misc_key_15
 ## SavedVariables: KRaidSkipTrackerDB
 
 ## Notes: KRaidSkipTracker
 ## Author: Kronus and Katatonik_Kat
-## Version: 11.0.2.16
+## Version: 11.0.5.17
 ## Dependencies: 
 ## LoadOnDemand: 0
-## X-Nominal-Version: 16
+## X-Nominal-Version: 17
 ## X-Curse-Project-ID: 978841
 
 ## OptionalDeps: Ace3
