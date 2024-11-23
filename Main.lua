@@ -35,6 +35,7 @@ local function tipOnEnter(self)
     end
 
     KRaidSkipTracker.UpdateCurrentPlayerData()
+
     local tooltip = LibQTip:Acquire("KKeyedTooltip", 1, "LEFT")
     self.tooltip = tooltip
 

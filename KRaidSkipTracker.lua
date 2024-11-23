@@ -9,6 +9,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 --[[ Player info ]]
 local CurrentPlayerIdString = UnitName("player") .. " - " .. GetRealmName()
+local WarbandIdString = "Warband"
 
 --[[ Fonts ]]
 local HeaderFont = CreateFont("HeaderFont")
@@ -100,6 +101,51 @@ local function LoadData()
     AllPlayersData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData()
 end
 
+local function GetWarbandTable()
+    local allxpacsTable = {}
+
+    -- For each xpac
+    for _, xpac in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        local xpacTable = {}
+
+        -- For each raid in xpac
+        for _, raid in ipairs(xpac.raids) do
+            local raidsTable = {}
+
+            -- For each quest in raid
+            for _, quest in ipairs(raid.quests) do
+                local isStarted, isCompleted = false, false
+
+                if raid.isStatistic then
+                    -- If it's a statistic
+                    isCompleted = IsStatisticComplete(quest.questId)
+                    isStarted = isCompleted
+                else
+                    -- Otherwise it's a quest
+                    isCompleted = IsQuestWarbandComplete(quest.questId)
+                end
+
+                -- insert the quest data into the raids table
+                table.insert(raidsTable, { isStarted = isStarted, isCompleted = isCompleted, questId = quest.questId, objectives = questObjectives })
+            end
+
+            -- insert the raid data into the xpacs table
+            table.insert(xpacTable, { isStatistic = raid.isStatistic, instanceId = raid.instanceId, quests = raidsTable })
+        end
+
+        -- insert the xpac table into the all xpacs table
+        table.insert(allxpacsTable, xpacTable)
+    end
+
+    local lastUpdateTime = GetServerTime()
+
+    local warbandData = { playerName = "Warband", playerRealm = "", playerClass = "(none)",
+        englishClass = "(none)", playerLevel = nil, playerILevel = nil, shouldShow = true,
+        lastUpdateServerTime = lastUpdateTime, data = allxpacsTable }
+
+    return warbandData
+end
+
 local function UpdateSortedPlayersData()
     PlayersDataToShow = {}
     local insertLocation = 1
@@ -127,6 +173,9 @@ local function UpdateSortedPlayersData()
     if playerData ~= nil then
         table.insert(PlayersDataToShow, 1, playerData)
     end
+
+    local warbandData = GetWarbandTable()
+    table.insert(PlayersDataToShow, 1, warbandData)
 end
 
 local function PreQueryAllQuestData()

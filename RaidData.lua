@@ -345,6 +345,13 @@ function IsQuestComplete(questId)
     return false
 end
 
+function IsQuestWarbandComplete(questId)
+    if questId ~= nil then
+        return C_QuestLog.IsQuestFlaggedCompletedOnAccount(questId)
+    end
+    return false
+end
+
 function IsStatisticComplete(statisticId)
     if statisticId ~= nil then
         local statisticValue = GetStatistic(statisticId)
