@@ -1,8 +1,20 @@
+### Version 11.0.7.18 Beta
+
+- Bumping TOC for latest patch (110007)
+
+
+### Version 11.0.5.17 Beta
+
+- Bumping TOC for latest patch (110005)
+
+
 ### Version 11.0.2.16 Beta
+
 - Adding localized strings for German locale
 
 
 ### Version 11.0.2.14 Beta
+
 - Removed an unused option
 - Added an option to show/hide minimap icon
 - Minimap icon position is now global to account and not per-character
