@@ -1,4 +1,4 @@
-﻿## Interface: 110005
+﻿## Interface: 110007
 ## Title: KRaidSkipTracker
 ## IconTexture: Interface\Icons\inv_misc_key_15
 ## SavedVariables: KRaidSkipTrackerDB
