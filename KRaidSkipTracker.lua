@@ -92,9 +92,9 @@ end
 
 local function InitializeFonts()
     HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
-    FooterTextFont:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    InstanceNameTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-    MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    FooterTextFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    InstanceNameTextFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
+    MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
 end
 
 local function LoadData()
@@ -194,7 +194,7 @@ local function PreQueryAllQuestData()
 end
 
 local function AddAllPlayersProgressToTooltip(tooltip, questId, cellRow)
-    tooltip:SetFont(InstanceNameTextFont)
+    tooltip:SetFont(MainTextFont)
     local cellColumn = 2 -- first column is for the instance name
     for _, player in ipairs(PlayersDataToShow) do
         if player.shouldShow then

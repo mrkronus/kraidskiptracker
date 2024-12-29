@@ -28,8 +28,15 @@ local RaidOrder =
     2522, -- DF: Vault of the Incarnates
     2569, -- DF: Aberrus, the Shadowed Crucible
     2549, -- DF: Amirdrassil, the Dream's Hope
+
+    2657, -- TWW: Nerub-ar Palace
 }
 
+-- Note: you can look up the ids here:
+-- InstanceID: https://wago.tools/db2/Map
+-- and https://wowpedia.fandom.com/wiki/InstanceID
+-- JournalID: https://wago.tools/db2/JournalInstance
+-- ZoneID: https://www.wowhead.com/guide/list-of-zone-ids-for-navigation-in-wow-and-tomtom-19501
 KRaidSkipTracker.questDataByExpansion =
 {
     {
@@ -237,6 +244,24 @@ KRaidSkipTracker.questDataByExpansion =
                     { questName = L["Normal"], questId = 78600 },
                     { questName = L["Heroic"], questId = 78601 },
                     { questName = L["Mythic"], questId = 78602 }
+                }
+            },
+        }
+    },
+    {
+        expansionName = EXPANSION_NAME10,
+        raids =
+        {
+            -- TWW: Nerub-ar Palace
+            {
+                instanceName = L["TWW_NAP_INSTANCE_NAME"], instanceShortName = L["TWW_NAP_INSTANCE_SHORT_NAME"], instanceId = 2657, journalInstanceId = 1273, isStatistic = false,
+                requiredLevel = "70", numberOfPlayers = "10/30", locatedInZoneId = 2255, -- Azj-Kahet
+                instanceDescriptionText = L["DEFAULT_DESCRIPTION_TEXT"],
+                quests =
+                {
+                    { questName = L["Normal"], questId = 82629 },
+                    { questName = L["Heroic"], questId = 82638 },
+                    { questName = L["Mythic"], questId = 82639 }
                 }
             },
         }

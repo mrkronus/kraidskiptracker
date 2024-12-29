@@ -128,3 +128,6 @@ L["DF_ASC_INSTANCE_SHORT_NAME"] = "Aberrus, Schmelztiegel der Schatten"
 
 L["DF_ADH_INSTANCE_NAME"] = "DF: Amirdrassil, Hoffnung des Traums"
 L["DF_ADH_INSTANCE_SHORT_NAME"] = "Amirdrassil, Hoffnung des Traums"
+
+L["TWW_NAP_INSTANCE_NAME"] = "TWW: Nerub-ar Palace"
+L["TWW_NAP_INSTANCE_SHORT_NAME"] = "Nerub-ar Palace"

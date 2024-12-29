@@ -52,7 +52,7 @@ AddonNamespace.Colors = {
 
 AddonNamespace.TextIcons =
 {
-    GreenCheck = '\124A:ui-lfg-readymark-raid:20:20\124a',
+    GreenCheck = '\124A:ui-lfg-readymark-raid:13:13\124a',
     GreenCheckLite = '\124A:UI-LFG-ReadyMark:20:20\124a',
     QuestQuestion = '\124A:QuestTurnin:20:20\124a',
     QuestExclamation = '\124A:QuestNormal:20:20\124a',

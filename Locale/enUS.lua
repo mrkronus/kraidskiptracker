@@ -126,3 +126,6 @@ L["DF_ASC_INSTANCE_SHORT_NAME"] = "Aberrus, the Shadowed Crucible"
 
 L["DF_ADH_INSTANCE_NAME"] = "DF: Amirdrassil, the Dream's Hope"
 L["DF_ADH_INSTANCE_SHORT_NAME"] = "Amirdrassil, the Dream's Hope"
+
+L["TWW_NAP_INSTANCE_NAME"] = "TWW: Nerub-ar Palace"
+L["TWW_NAP_INSTANCE_SHORT_NAME"] = "Nerub-ar Palace"

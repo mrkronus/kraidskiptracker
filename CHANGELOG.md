@@ -1,3 +1,9 @@
+### Version 11.0.7.19 Beta
+
+- Fixing some UI alignment issues
+- Adding support for Nerub-ar Palace skip with the quest For Nerubian Eyes Only
+### Please note: If you already have progress on the Nerub-ar Palace skip quest with any character, you will need to log into that character and open the addon in order to update the individual progress.
+
 ### Version 11.0.7.18 Beta
 
 - Bumping TOC for latest patch (110007)

@@ -5,10 +5,10 @@
 
 ## Notes: KRaidSkipTracker
 ## Author: Kronus and Katatonik_Kat
-## Version: 11.0.5.17
+## Version: 11.0.5.19
 ## Dependencies: 
 ## LoadOnDemand: 0
-## X-Nominal-Version: 18
+## X-Nominal-Version: 19
 ## X-Curse-Project-ID: 978841
 
 ## OptionalDeps: Ace3
