@@ -50,9 +50,9 @@ KRaidSkipTracker.questDataByExpansion =
                 instanceDescriptionText = L["WOD_BRF_DESCRIPTION_TEXT"],
                 quests =
                 {
-                    { questName = L["Normal"], questId = 37030 },
-                    { questName = L["Heroic"], questId = 37031 },
-                    { questName = L["Mythic"], questId = 37029 },
+                    { questName = L["Normal"], questId = 37029 },
+                    { questName = L["Heroic"], questId = 37030 },
+                    { questName = L["Mythic"], questId = 37031 },
                 }
             },
 

@@ -6,6 +6,11 @@
 
 ### Version 11.0.7.18 Beta
 
+- Resolving the issue where Blackrock Foundry was mixing up skip progress between normal, heroic, and mythic quests
+
+
+### Version 11.0.7.18 Beta
+
 - Bumping TOC for latest patch (110007)
 
 
