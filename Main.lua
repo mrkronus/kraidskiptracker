@@ -241,7 +241,7 @@ function LibAceAddon:OnInitialize()
         OnEnter = tipOnEnter
     })
 
-    libIcon:Register("K Keyed", dataobj, self.db.global.minimap)
+    libIcon:Register("K Raid Skip Tracker", dataobj, self.db.global.minimap)
 
     aceOptions.args.charactersHeader = {
         type = "header",
