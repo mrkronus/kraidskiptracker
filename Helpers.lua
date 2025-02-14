@@ -255,11 +255,16 @@ function getClassIcon(class)
     return ("\124TInterface/Icons/classicon_%s:0\124t"):format(strlower(class))
 end
 
+---@diagnostic disable-next-line: lowercase-global
 function kprint(string, ...)
     if string ~= nil then
         if AddonNamespace.LibAceAddon:ShouldShowDebugOutput() then
-            print(colorize("KAutoMark: ", AddonNamespace.Colors.Warlock)..colorize(string, AddonNamespace.Colors.White), ...)
+            print(colorize(addonName..": ", AddonNamespace.Colors.Warlock)..colorize(string, AddonNamespace.Colors.White), ...)
+    --     else
+    --         print(addonName..": kprint disabled!")
         end
+    -- else
+    --     print(addonName..": kprint called with nil!")
     end
 end
 
