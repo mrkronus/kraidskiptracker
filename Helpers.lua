@@ -256,10 +256,10 @@ function getClassIcon(class)
 end
 
 ---@diagnostic disable-next-line: lowercase-global
-function kprint(string, ...)
+local function kprint(string, ...)
     if string ~= nil then
         if AddonNamespace.LibAceAddon:ShouldShowDebugOutput() then
-            print(colorize(addonName..": ", AddonNamespace.Colors.Warlock)..colorize(string, AddonNamespace.Colors.White), ...)
+            print(colorize(addonName..": ", AddonNamespace.Colors.Legendary)..colorize(string, AddonNamespace.Colors.White), ...)
     --     else
     --         print(addonName..": kprint disabled!")
         end
@@ -267,6 +267,7 @@ function kprint(string, ...)
     --     print(addonName..": kprint called with nil!")
     end
 end
+AddonNamespace.kprint = kprint
 
 ---@diagnostic disable-next-line: lowercase-global
 function colorize(string, color)

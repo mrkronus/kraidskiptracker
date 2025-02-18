@@ -423,7 +423,7 @@ function DoesRaidDataHaveAnyProgressOnAnyCharacter(raidId)
                 if raid.instanceId == raidId then
                     if DoesRaidDataHaveAnyProgress(raid) then
                         if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                            print(player.playerName .. L["has progress on quest"] .. raid.instanceId)
+                            kprint(player.playerName .. L["has progress on quest"] .. raid.instanceId)
                         end
                         return true
                     end
@@ -442,7 +442,7 @@ function DoesQuestDataHaveAnyProgressOnAnyCharacter(questId)
                     if quest.questId == questId then
                         if quest.isCompleted or quest.isStarted then
                             if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                                print(player.playerName .. L["has progress on quest"] .. questId)
+                                kprint(player.playerName .. L["has progress on quest"] .. questId)
                             end
                             return true
                         end

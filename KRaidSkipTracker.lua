@@ -1,4 +1,5 @@
 local addonName, KRaidSkipTracker = ...
+local kprint = KRaidSkipTracker.kprint
 
 --[[-------------------------------------------------------------------------
 	Variables
@@ -283,7 +284,7 @@ local function AddExpansionToTooltip(tooltip, xpac, cellRow)
     for _, raid in ipairs(xpac) do
         if (KRaidSkipTracker.LibAceAddon:ShouldAlwaysShowAllRaidHeadings() == false) and KRaidSkipTracker.LibAceAddon:ShouldHideNoProgressRaids() and (not DoesRaidDataHaveAnyProgressOnAnyCharacter(raid.instanceId)) then
             if KRaidSkipTracker.LibAceAddon:ToggleShowDebugOutput() then
-                print("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
+                kprint("Skipping raid: " .. GetRaidInstanceNameFromIdInData(raid.instanceId))
             end
         else
             tooltip:SetFont(InstanceNameTextFont)
@@ -480,7 +481,7 @@ local function UpdateCurrentPlayerData()
                 if KRaidSkipTracker.LibAceAddon:ShouldShowDebugOutput() then
                     local questObjectives = C_QuestLog.GetQuestObjectives(quest.questId)
                     local objectivesString = GetCombinedObjectivesString(quest.questId, questObjectives)
-                    print(quest.questId .. " | " .. tostring(isStarted) .. " | " .. tostring(isCompleted) .. " | " .. objectivesString)
+                    kprint(quest.questId .. " | " .. tostring(isStarted) .. " | " .. tostring(isCompleted) .. " | " .. objectivesString)
                 end
             end
 
