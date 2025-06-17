@@ -1,5 +1,4 @@
-### Version 11.1.7.24 beta
-
+### Version 11.1.7.23 beta
 - Bumping TOC for latest patch (110107)
 
 
