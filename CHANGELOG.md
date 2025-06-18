@@ -1,3 +1,8 @@
+### Version 11.1.7.24 Beta
+
+- Fixing broken folder structure
+
+
 ### Version 11.1.7.23 beta
 - Bumping TOC for latest patch (110107)
 
