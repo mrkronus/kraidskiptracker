@@ -5,11 +5,11 @@
 
 ## Notes: KRaidSkipTracker
 ## Author: Kronus and Katatonik_Kat
-## Version: 11.1.7.24
+## Version: 11.1.7.25
 ## X-Release-Type: beta
 ## Dependencies: 
 ## LoadOnDemand: 0
-## X-Nominal-Version: 24
+## X-Nominal-Version: 25
 ## X-Curse-Project-ID: 978841
 
 ## OptionalDeps: Ace3
@@ -21,6 +21,11 @@ Locale.xml
 #@end-no-lib-strip@
 
 # KRaidSkipTracker
+
+modules\PlayerModel.lua
+modules\RaidModel.lua
+modules\RaidTrackerService.lua
+
 RaidData.lua
 Helpers.lua
 KRaidSkipTracker.lua

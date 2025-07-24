@@ -1,5 +1,12 @@
 ### Version 11.1.7.24 Beta
 
+- Complete re-write of the code to be cleaner and easier to maintain for future updates / new raids
+- Many changes to the layout of the UI
+- A number of new options have been added
+
+
+### Version 11.1.7.24 Beta
+
 - Fixing broken folder structure
 
 

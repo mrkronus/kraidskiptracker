@@ -63,6 +63,9 @@ AddonNamespace.TextIcons =
     RoleIconPending = '\124A:ui-lfg-roleicon-pending:20:20\124a',
     Horde = '\124A:horde_icon_and_flag-icon:20:20\124a',
     Alliance = '\124A:alliance_icon_and_flag-icon:20:20\124a',
+    HeroicIcon = "|A:ui-icon-heroic-sigil:13:13|a",
+    MythicIcon = "|A:ui-icon-mythic-sigil:13:13|a",
+    RedX = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:14|t"
 }
 
 AddonNamespace.RaidMarkerValues =

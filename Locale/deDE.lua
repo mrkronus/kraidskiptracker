@@ -33,6 +33,10 @@ L["Total Tracked Characters: "] = "Anzahl verfolgter Charactere: "
 
 -- Minimap Icon/LibDB Tooltip
 L["Right click icon for options"] = "Rechtsklick öffnet Optionsmenu"
+L["Unlocked: "] = "Unlocked: "
+L["Not yet unlocked"] = "Not yet unlocked"
+L["Unlocked up to Heroic"] = "Unlocked up to Heroic"
+L["All difficulties unlocked"] = "All difficulties unlocked"
 
 -- Options
 L["Hide minimap button"] = "Minimap Button ausblenden"

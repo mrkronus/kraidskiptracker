@@ -404,48 +404,62 @@ end
 ---------------------------------------------------------------------------]]
 
 local function PopulateTooltip(tooltip)
-    UpdateSortedPlayersData()
-    tooltip:SetCellMarginH(10) -- must be done before any data is added
-    local playersCount = GetTotalPlayersCountInData()
-    for i = 1, playersCount do tooltip:AddColumn("CENTER") end
-
-    tooltip:SetFont(HeaderFont)
-    local y, x = tooltip:AddLine()
-    tooltip:SetCell(y, 1, colorize("K Raid Skip Tracker", KRaidSkipTracker.Colors.Header))
-
-    tooltip:SetCellScript(y, 1, "OnEnter", MouseHandler, function()
-        local hoverTooltip = KRaidSkipTracker.LibQTip:Acquire("KKeyedHoverTooltip", 2, "LEFT", "RIGHT")
-        tooltip.tooltip = hoverTooltip
-        local totalToons = GetTotalPlayersCountInAllPlayersData();
-
-        hoverTooltip:SetFont(InstanceNameTextFont)
-        hoverTooltip:AddLine(colorize(L["Total Shown Characters: "], KRaidSkipTracker.Colors.White), colorize(tostring(playersCount), KRaidSkipTracker.Colors.White))
-        hoverTooltip:AddLine(colorize(L["Total Tracked Characters: "], KRaidSkipTracker.Colors.White), colorize(tostring(totalToons), KRaidSkipTracker.Colors.White))
-        hoverTooltip:AddSeparator()
-        hoverTooltip:AddLine(colorize(" ", nil), colorize(C_AddOns.GetAddOnMetadata("KRaidSkipTracker", "Version"), KRaidSkipTracker.Colors.Grey))
-
-        hoverTooltip:SetAutoHideDelay(0.01, tooltip)
-        hoverTooltip:SmartAnchorTo(tooltip)
-        hoverTooltip:Show()
-    end)
-    tooltip:SetCellScript(y, 1, "OnLeave", MouseHandler, function()
-        if tooltip.tooltip ~= nil then
-            tooltip.tooltip:Release()
-            tooltip.tooltip = nil
-        end
-    end)
-
-    AddPlayersToTooltip(tooltip, y)
-    tooltip:AddSeparator()
-
-    PlayerData = PlayersDataToShow[1]
-    for _, xpac in ipairs(PlayerData.data) do
-        AddExpansionToTooltip(tooltip, xpac)
+    if not KRaidSkipTracker.VisiblePlayers then
+        tooltip:AddLine("Data is still loading…")
+        return
     end
 
+    tooltip:SetFont(GameTooltipText)
+    tooltip:SetCellMarginH(16)           -- wider horizontal spacing
+    tooltip:SetCellMarginV(6)            -- optional vertical breathing room
+
+    local raids = KRaidSkipTracker.Raids
+    local players = KRaidSkipTracker.VisiblePlayers
+    local warband = KRaidSkipTracker.WarbandPlayer
+
+    -- Column: [Raid Name] | [Warband] | [Player1] | [Player2] | ...
+    local numColumns = 2 + #players
+    for i = 1, numColumns do
+        tooltip:AddColumn("CENTER")
+    end
+
+    tooltip:SetFont(HeaderFont)
+
+    -- Header Row
+    local header = tooltip:AddLine()
+    tooltip:SetCell(header, 1, colorize("Raid", KRaidSkipTracker.Colors.Header))
+    tooltip:SetCell(header, 2, colorize("Warband", KRaidSkipTracker.Colors.Header))
+    for i, player in ipairs(players) do
+        tooltip:SetCell(header, 2 + i, colorize(player.name, classToColor(player.class)))
+    end
+
+    tooltip:AddSeparator()
+
+    -- Raid Rows
+    local lastExpansion = nil
+
+    for _, raid in ipairs(raids) do
+        if raid.expansion ~= lastExpansion then
+            tooltip:AddSeparator()
+            tooltip:AddLine(colorize(raid.expansion, KRaidSkipTracker.Colors.Header))
+            lastExpansion = raid.expansion
+        end
+
+        local row = tooltip:AddLine()
+        tooltip:SetCell(row, 1, colorize(raid.name, KRaidSkipTracker.Colors.SubHeader))
+        tooltip:SetCell(row, 2, raid:GetSkipSummary(warband))
+
+        for i, player in ipairs(players) do
+            tooltip:SetCell(row, 2 + i, raid:GetSkipSummary(player))
+        end
+    end
+
+
+    tooltip:AddSeparator()
     tooltip:SetFont(FooterTextFont)
-    tooltip:AddLine(colorize(L["Right click icon for options"], KRaidSkipTracker.Colors.FooterDark))
+    tooltip:AddLine(colorize("Right click icon for options", KRaidSkipTracker.Colors.FooterDark))
 end
+
 KRaidSkipTracker.PopulateTooltip = PopulateTooltip
 
 local function UpdateCurrentPlayerData()
@@ -537,9 +551,62 @@ local function TogglePlayerVisibility(playerName, playerRealm)
 end
 KRaidSkipTracker.TogglePlayerVisibility = TogglePlayerVisibility
 
-local function Initialize()
+local function InitializeLegacy()
     InitializeFonts()
     LoadData()
     PreQueryAllQuestData()
 end
+KRaidSkipTracker.InitializeLegacy = InitializeLegacy
+
+local function MigrateLegacyData(legacyData)
+    AllPlayersData = {}
+
+    for playerId, raw in pairs(legacyData or {}) do
+        AllPlayersData[playerId] = KRaidSkipTracker.Models.Player:New(raw)
+    end
+
+    -- Also build the warband from scratch
+    local warbandRaw = GetWarbandTable()
+    KRaidSkipTracker.WarbandPlayer = KRaidSkipTracker.Models.Player:New(warbandRaw)
+    AllPlayersData["Warband"] = KRaidSkipTracker.WarbandPlayer
+
+    KRaidSkipTracker.LegacyBackup = CopyTable(legacyData)
+end
+KRaidSkipTracker.MigrateLegacyData = MigrateLegacyData
+
+local function Initialize()
+    -- Initialize fonts
+    InitializeFonts()
+
+    -- Load legacy data from DB
+    local rawPlayerData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData() or {}
+    AllPlayersData = {}
+
+    for playerId, raw in pairs(rawPlayerData) do
+        AllPlayersData[playerId] = KRaidSkipTracker.Models.Player:New(raw)
+    end
+
+    -- Build and store warband model
+    local warbandRaw = GetWarbandTable()
+    KRaidSkipTracker.WarbandPlayer = KRaidSkipTracker.Models.Player:New(warbandRaw)
+    AllPlayersData["Warband"] = KRaidSkipTracker.WarbandPlayer
+
+    -- Build visible player list using config filters
+    KRaidSkipTracker.VisiblePlayers =
+        KRaidSkipTracker.Services.RaidTracker:GetVisiblePlayers(AllPlayersData)
+
+    -- Convert raid data into structured models
+    local structuredRaids = {}
+    for _, expansion in ipairs(KRaidSkipTracker.questDataByExpansion) do
+        for _, raidRaw in ipairs(expansion.raids) do
+            table.insert(structuredRaids,
+                KRaidSkipTracker.Models.RaidModel:New(raidRaw))
+        end
+    end
+    KRaidSkipTracker.Raids = structuredRaids
+
+    -- Optional: warm up caches or touch quests to avoid delay
+    PreQueryAllQuestData()
+end
 KRaidSkipTracker.Initialize = Initialize
+
