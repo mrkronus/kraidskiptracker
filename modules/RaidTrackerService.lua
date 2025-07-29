@@ -19,11 +19,12 @@ RaidTracker.__index = RaidTracker
 function RaidTracker:GetVisiblePlayers(allPlayers)
     local visible = {}
     for charId, raw in pairs(allPlayers or {}) do
-        local player = type(raw) == "table" and raw._isPlayerModel
-            and raw or KRaidSkipTracker.Models.Player:New(raw)
-        if player:ShouldBeDisplayed() then
+        local player = type(raw) == "table" and raw._isPlayerModel and raw or KRaidSkipTracker.Models.Player:New(raw)
+        print("> inserting player:")
+        DevTools_Dump(player)
+        --if player:ShouldBeDisplayed() then
             table.insert(visible, player)
-        end
+        --end
     end
     return visible
 end

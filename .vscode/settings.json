@@ -42,6 +42,7 @@
         "AddonCompartmentFrame",
         "BACKDROP_SLIDER_8_8",
         "TooltipBackdropTemplateMixin",
-        "NineSlicePanelMixin"
+        "NineSlicePanelMixin",
+        "Add"
     ]
 }

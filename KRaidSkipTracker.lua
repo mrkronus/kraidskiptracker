@@ -99,7 +99,7 @@ local function InitializeFonts()
 end
 
 local function LoadData()
-    AllPlayersData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData()
+    AllPlayersData = KRaidSkipTracker.Models.Player:GetAllPlayers()
 end
 
 local function GetWarbandTable()
@@ -579,7 +579,7 @@ local function Initialize()
     InitializeFonts()
 
     -- Load legacy data from DB
-    local rawPlayerData = KRaidSkipTracker.LibAceAddon:GetDBAllPlayersData() or {}
+    local rawPlayerData = KRaidSkipTracker.Models.Player:GetAllPlayers() or {}
     AllPlayersData = {}
 
     for playerId, raw in pairs(rawPlayerData) do
@@ -600,7 +600,7 @@ local function Initialize()
     for _, expansion in ipairs(KRaidSkipTracker.questDataByExpansion) do
         for _, raidRaw in ipairs(expansion.raids) do
             table.insert(structuredRaids,
-                KRaidSkipTracker.Models.RaidModel:New(raidRaw))
+                KRaidSkipTracker.Models.Raid:New(raidRaw))
         end
     end
     KRaidSkipTracker.Raids = structuredRaids

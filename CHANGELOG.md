@@ -1,4 +1,4 @@
-### Version 11.1.7.24 Beta
+### Version 11.1.7.25 Beta
 
 - Complete re-write of the code to be cleaner and easier to maintain for future updates / new raids
 - Many changes to the layout of the UI

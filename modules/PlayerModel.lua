@@ -1,5 +1,5 @@
 --[[-------------------------------------------------------------------------
-	Addon Data Initialization
+    PlayerModel
 ---------------------------------------------------------------------------]]
 
 local addonName, KRaidSkipTracker = ...
@@ -14,38 +14,41 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 KRaidSkipTracker.Models = KRaidSkipTracker.Models or {}
 local PlayerModel = {}
-KRaidSkipTracker.Models.Player = PlayerModel
 PlayerModel.__index = PlayerModel
 
-function PlayerModel:New(data)
+function PlayerModel:New(raw)
+    raw = raw or {}
     local self = setmetatable({}, PlayerModel)
 
-    self.name       = data.playerName
-    self.realm      = data.playerRealm
-    self.class      = data.englishClass
-    self.level      = data.playerLevel
-    self.iLevel     = data.playerILevel
-    self.visible    = data.shouldShow or true
-    self.lastUpdate = data.lastUpdateServerTime
-    self.skips      = {}  -- keyed by instanceId
+    self.id             = raw.id
+    self.guid           = raw.guid or raw.id
+    self.name           = raw.name or raw.playerName or "Unknown"
+    self.realm          = raw.realm or GetRealmName()
+    self.class          = raw.class or raw.playerClass or "(none)"
+    self.visible        = raw.visible ~= false
+    self.displayName    = raw.displayName or (self.name .. "\n" .. self.realm)
 
-    for xpacIndex, xpac in ipairs(data.data or {}) do
-        for raidIndex, raidData in ipairs(xpac) do
-            local raidSkips = {}
-            for _, questData in ipairs(raidData.quests) do
-                raidSkips[questData.questId] = {
-                    isCompleted = questData.isCompleted,
-                    isStarted   = questData.isStarted,
-                    objectives  = questData.objectives
-                }
+    local skips = raw.skips or raw.progress or {}
+    local normalized = {}
+
+    for _, raidQuests in pairs(skips) do
+        for _, quest in ipairs(raidQuests) do
+            if quest.questId then
+                normalized[quest.questId] = quest
             end
-            self.skips[raidData.instanceId] = raidSkips
         end
     end
+
+    self.skips = normalized
 
     return self
 end
 
+function PlayerModel:GetProgressForRaid(instanceId)
+    return self.skips and self.skips[instanceId] or {}
+end
+
+-- Returns true if this toon has started the given quest
 function PlayerModel:HasQuest(questId)
     for _, raidQuests in pairs(self.skips) do
         if raidQuests[questId] and raidQuests[questId].isStarted then
@@ -55,30 +58,28 @@ function PlayerModel:HasQuest(questId)
     return false
 end
 
+-- Returns true if this toon has completed the given quest
 function PlayerModel:IsQuestComplete(questId)
     for _, raidQuests in pairs(self.skips) do
-        if raidQuests[questId] and raidQuests[questId].isCompleted then
+        if type(raidQuests) == "table" and raidQuests[questId] and raidQuests[questId].isCompleted then
             return true
         end
     end
     return false
 end
 
+-- Returns true if this toon should be shown in tooltips/UI
 function PlayerModel:ShouldBeDisplayed()
     if not self.visible then return false end
 
     if KRaidSkipTracker.LibAceAddon:ShouldShowOnlyCurrentRealm() then
-        if self.realm ~= GetRealmName() then
-            return false
-        end
+        if self.realm ~= GetRealmName() then return false end
     end
 
     if KRaidSkipTracker.LibAceAddon:ShouldShowOnlyQuestHolders() then
-        for _, raidQuests in pairs(self.skips or {}) do
+        for _, raidQuests in pairs(self.skips) do
             for _, quest in pairs(raidQuests) do
-                if quest.isStarted then
-                    return true
-                end
+                if quest.isStarted then return true end
             end
         end
         return false
@@ -87,3 +88,4 @@ function PlayerModel:ShouldBeDisplayed()
     return true
 end
 
+KRaidSkipTracker.Models.Player = PlayerModel

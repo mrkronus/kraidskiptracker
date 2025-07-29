@@ -400,16 +400,16 @@ function LibAceAddon:OnInitialize()
     -- end
 end
 
-function LibAceAddon:GetDBAllPlayersData()
-    if self.db.profile.allPlayersData == nil then
-        return {}
-    end
-    return self.db.profile.allPlayersData
-end
+-- function LibAceAddon:GetDBAllPlayersData()
+--     if self.db.profile.allPlayersData == nil then
+--         return {}
+--     end
+--     return self.db.profile.allPlayersData
+-- end
 
-function LibAceAddon:GetDBDataVersion()
-    if self.db.profile.dataVersion == nil then
-        return "0.0.0"
-    end
-    return self.db.profile.dataVersion
-end
+-- function LibAceAddon:GetDBDataVersion()
+--     if self.db.profile.dataVersion == nil then
+--         return "0.0.0"
+--     end
+--     return self.db.profile.dataVersion
+-- end
