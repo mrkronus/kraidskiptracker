@@ -1,91 +1,174 @@
 --[[-------------------------------------------------------------------------
-    PlayerModel
+    ProgressLogic.lua
+    Handles step completion logic, quest status evaluation, and override helpers
 ---------------------------------------------------------------------------]]
 
-local addonName, KRaidSkipTracker = ...
-local kprint = KRaidSkipTracker.kprint
-
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local _, Addon = ...
 
 
 --[[-------------------------------------------------------------------------
-	PlayerModel Initialization
+    Globals and Constants
 ---------------------------------------------------------------------------]]
 
-KRaidSkipTracker.Models = KRaidSkipTracker.Models or {}
-local PlayerModel = {}
-PlayerModel.__index = PlayerModel
+local kprint = Addon.kprint
 
-function PlayerModel:New(raw)
-    raw = raw or {}
-    local self = setmetatable({}, PlayerModel)
+local statusTextures = {
+    complete   = "Interface\\RaidFrame\\ReadyCheck-Ready",
+    active     = "Interface\\Buttons\\UI-CheckBox-Check",
+    onQuest    = "Interface\\RaidFrame\\ReadyCheck-NotReady",
+    incomplete = "Interface\\RaidFrame\\ReadyCheck-NotReady"
+}
 
-    self.id             = raw.id
-    self.guid           = raw.guid or raw.id
-    self.name           = raw.name or raw.playerName or "Unknown"
-    self.realm          = raw.realm or GetRealmName()
-    self.class          = raw.class or raw.playerClass or "(none)"
-    self.visible        = raw.visible ~= false
-    self.displayName    = raw.displayName or (self.name .. "\n" .. self.realm)
 
-    local skips = raw.skips or raw.progress or {}
-    local normalized = {}
+--[[-------------------------------------------------------------------------
+    Module Table
+---------------------------------------------------------------------------]]
 
-    for _, raidQuests in pairs(skips) do
-        for _, quest in ipairs(raidQuests) do
-            if quest.questId then
-                normalized[quest.questId] = quest
+Addon.ProgressLogic = {}
+local ProgressLogic = Addon.ProgressLogic
+
+
+--[[-------------------------------------------------------------------------
+    Player Context Helpers
+---------------------------------------------------------------------------]]
+
+--- Returns the player's faction ("Alliance" or "Horde")
+function ProgressLogic:GetFaction()
+    return UnitFactionGroup("player")
+end
+
+--- Returns the player's current level
+function ProgressLogic:GetPlayerLevel()
+    return UnitLevel("player")
+end
+
+--- Constructs the evaluation context (level, faction)
+function ProgressLogic:GetContext()
+    return {
+        level = self:GetPlayerLevel(),
+        faction = self:GetFaction()
+    }
+end
+
+
+--[[-------------------------------------------------------------------------
+    Quest ID Resolution
+---------------------------------------------------------------------------]]
+
+--- Resolves faction-specific quest ID
+-- If questID is a table, returns the faction's ID; otherwise returns the number
+function ProgressLogic:ResolveFactionalQuestID(questID, faction)
+    if type(questID) == "table" then
+        return questID[faction:lower()]
+    end
+    return questID
+end
+
+
+--[[-------------------------------------------------------------------------
+    Step Completion Evaluation
+---------------------------------------------------------------------------]]
+
+--- Evaluates whether a step is complete based on context and sibling steps
+-- Supports chained, parallel, choice, and nested steps
+function ProgressLogic:IsStepComplete(step, ctx, steps, index)
+    if step.dependsOnNext and steps and index then
+        local nextStep = steps[index + 1]
+        if nextStep then
+            local status = self:GetStepStatus(nextStep, ctx, true, steps, index + 1)
+            if status == "active" or status == "complete" then
+                return true
             end
         end
     end
 
-    self.skips = normalized
+    if type(step.completed) == "function" then
+        local ok, result = pcall(step.completed, ctx)
+        return ok and result or false
+    end
 
-    return self
-end
+    if step.questID then
+        local id = self:ResolveFactionalQuestID(step.questID, ctx.faction)
+        return C_QuestLog.IsQuestFlaggedCompleted(id)
+    end
 
-function PlayerModel:GetProgressForRaid(instanceId)
-    return self.skips and self.skips[instanceId] or {}
-end
-
--- Returns true if this toon has started the given quest
-function PlayerModel:HasQuest(questId)
-    for _, raidQuests in pairs(self.skips) do
-        if raidQuests[questId] and raidQuests[questId].isStarted then
-            return true
+    local children = step.steps or {}
+    if step.type == "parallel" then
+        for i, sub in ipairs(children) do
+            if not self:IsStepComplete(sub, ctx, children, i) then
+                return false
+            end
         end
-    end
-    return false
-end
-
--- Returns true if this toon has completed the given quest
-function PlayerModel:IsQuestComplete(questId)
-    for _, raidQuests in pairs(self.skips) do
-        if type(raidQuests) == "table" and raidQuests[questId] and raidQuests[questId].isCompleted then
-            return true
-        end
-    end
-    return false
-end
-
--- Returns true if this toon should be shown in tooltips/UI
-function PlayerModel:ShouldBeDisplayed()
-    if not self.visible then return false end
-
-    if KRaidSkipTracker.LibAceAddon:ShouldShowOnlyCurrentRealm() then
-        if self.realm ~= GetRealmName() then return false end
-    end
-
-    if KRaidSkipTracker.LibAceAddon:ShouldShowOnlyQuestHolders() then
-        for _, raidQuests in pairs(self.skips) do
-            for _, quest in pairs(raidQuests) do
-                if quest.isStarted then return true end
+        return true
+    elseif step.type == "choice" and step.options then
+        for i, opt in ipairs(step.options) do
+            if self:IsStepComplete(opt, ctx, step.options, i) then
+                return true
             end
         end
         return false
+    elseif next(children) then
+        for i, sub in ipairs(children) do
+            if not self:IsStepComplete(sub, ctx, children, i) then
+                return false
+            end
+        end
+        return true
     end
 
-    return true
+    return false
 end
 
-KRaidSkipTracker.Models.Player = PlayerModel
+
+--[[-------------------------------------------------------------------------
+    Status Evaluation
+---------------------------------------------------------------------------]]
+
+--- Resolves step status: "complete", "onQuest", "active", or fallback
+function ProgressLogic:GetStepStatus(step, ctx, useFallback, steps, index)
+    if self:IsStepComplete(step, ctx, steps, index) then
+        return "complete"
+    end
+
+    local questID = step.questID and self:ResolveFactionalQuestID(step.questID, ctx.faction)
+    local isOnQuest = questID and C_QuestLog.IsOnQuest(questID)
+
+    if isOnQuest then return "onQuest"
+    elseif step.active then return "active"
+    elseif step.title and string.find(step.title, "Quest") then return "onQuest"
+    elseif useFallback then
+        local prev = index and index > 1 and steps[index - 1]
+        local prevComplete = prev and self:IsStepComplete(prev, ctx, steps, index - 1)
+        return prevComplete and "active" or "incomplete"
+    end
+
+    return nil
+end
+
+--- Returns texture path for status indicator
+function ProgressLogic:GetStatusTexture(status)
+    return statusTextures[status] or statusTextures["active"]
+end
+
+
+--[[-------------------------------------------------------------------------
+    Manual Override Support
+---------------------------------------------------------------------------]]
+
+--- Manually marks a step as complete via quest ID, useful for external sync
+function ProgressLogic:MarkStepCompleteByQuestID(questID)
+    local zoneID = Addon.UnlockData and Addon.UnlockData.activeZoneID
+    if not zoneID then return end
+
+    local steps = Addon.UnlockData:GetSteps(zoneID)
+    Addon.UnlockData:WalkSteps(steps, function(step)
+        local resolvedID = self:ResolveFactionalQuestID(step.questID, self:GetFaction())
+        if resolvedID == questID then
+            if type(step.completed) ~= "function" then
+                step.completed = function(_) return true end
+            else
+                step._manualComplete = true
+            end
+        end
+    end)
+end
