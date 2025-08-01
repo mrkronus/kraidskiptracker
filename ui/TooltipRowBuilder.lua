@@ -1,101 +1,140 @@
 --[[-------------------------------------------------------------------------
-	Data Initialization
+    TooltipRowBuilder.lua
+    Composes tooltip rows for raid skip summary using inline textures.
 ---------------------------------------------------------------------------]]
 
 local addonName, KRaidSkipTracker = ...
 local kprint = KRaidSkipTracker.kprint
 
-local KRaidSkipTracker = KRaidSkipTracker
 local L = LibStub("AceLocale-3.0"):GetLocale(KRaidSkipTracker.Settings.AddonName)
 
-local HeaderFont = CreateFont("KRaidSkip_HeaderFont")
-HeaderFont:SetFont("Fonts\\FRIZQT__.TTF", 16, "")
-local MainTextFont = CreateFont("KRaidSkip_MainTextFont")
-MainTextFont:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-local InstanceNameFont = CreateFont("KRaidSkip_InstanceFont")
-InstanceNameFont:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
-local FooterFont = CreateFont("KRaidSkip_FooterFont")
-FooterFont:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+
+local Colors = KRaidSkipTracker.Colors
 
 
 --[[-------------------------------------------------------------------------
-	TooltipRowBuilder
+    Helpers
 ---------------------------------------------------------------------------]]
 
-local function AttachHoverTooltip(parentTooltip, anchorCell, lines)
+--- Attaches a hover tooltip with the given lines to the specified anchor cell.
+--- @param parentTooltip table
+--- @param anchorCell table
+--- @param lines string[]
+function AttachHoverTooltip(parentTooltip, anchorCell, lines)
     local hover = KRaidSkipTracker.LibQTip:Acquire("KRaidHoverTooltip", 1, "LEFT")
     parentTooltip.tooltip = hover
-    hover:SetFont(MainTextFont)
 
+    hover:SetFont(KRaidSkipTracker.Fonts.MainText)
     for _, line in ipairs(lines) do
-        hover:AddLine(colorize(line, KRaidSkipTracker.Colors.White))
+        local styled = colorize(line, KRaidSkipTracker.Colors.White)
+        hover:AddLine(styled, "LEFT", KRaidSkipTracker.Colors.White)
     end
 
-    hover:SetAutoHideDelay(0.01, parentTooltip)
     hover:SmartAnchorTo(anchorCell)
+    hover:SetAutoHideDelay(0.01, parentTooltip)
     hover:Show()
+end
+
+--- Returns texture string representing unlock status.
+--- @param snapshot table
+--- @param raidId number
+--- @return string # Texture tag (|T...|t)
+local function getUnlockTexture(snapshot, raidId)
+    local id = tonumber(raidId)
+    local progress = snapshot.progressByRaid and snapshot.progressByRaid[id]
+
+    if not progress then
+        return "|TInterface\\Common\\Indicator-Gray:16:16|t"  -- Unknown / no data
+    end
+
+    for _, entry in ipairs(progress) do
+        if entry.isComplete then
+            return "|TInterface\\RaidFrame\\ReadyCheck-Ready:16:16|t"  -- Completed
+        end
+        if entry.hasStarted then
+            return "|TInterface\\RaidFrame\\ReadyCheck-Waiting:16:16|t" -- Started
+        end
+    end
+
+    return "|TInterface\\RaidFrame\\ReadyCheck-NotReady:16:16|t" -- Not started
 end
 
 
 --[[-------------------------------------------------------------------------
-	TooltipRowBuilder
+    TooltipRowBuilder
 ---------------------------------------------------------------------------]]
 
 local TooltipRowBuilder = {}
 
+--- Adds a formatted header row to the tooltip based on the list of players.
+-- Each cell displays the player's name and optionally their realm, with class-based coloring.
+-- Warband entries are styled separately.
+-- @param tooltip The tooltip object being populated
+-- @param players A list of player data structs to render in header columns
 function TooltipRowBuilder:AddHeaderRow(tooltip, players)
-    tooltip:SetFont(HeaderFont)
-
+    tooltip:SetFont(KRaidSkipTracker.Fonts.Heading)
     local header = tooltip:AddLine()
-    tooltip:SetCell(header, 1, colorize("Raid", KRaidSkipTracker.Colors.Header))
-    tooltip:SetCell(header, 2, colorize("Warband", KRaidSkipTracker.Colors.Header))
 
-    for i, player in ipairs(players) do
-        if player.guid ~= "Warband" then
-            local display = player.displayName
-            local color   = classToColor(player.englishClass or player.class or "(none)")
-            print("setting header cell:", display, color, player.displayName, player.englishClass, player.class)
-            tooltip:SetCell(header, 2 + i, colorize(display, color))
-        end
-    end
-end
+    for col, player in ipairs(players) do
+        local name = player.name or player.displayName or "?"
+        local realm = player.realm or ""
+        local display
 
-function TooltipRowBuilder:AddExpansionBreak(tooltip, expansionName)
-    tooltip:AddSeparator()
-    tooltip:SetFont(HeaderFont)
-    tooltip:AddLine(colorize(expansionName, KRaidSkipTracker.Colors.Header))
-end
-
-function TooltipRowBuilder:AddRaidRow(tooltip, raid, warbandPlayer, players)
-    tooltip:SetFont(MainTextFont)
-
-    local row = tooltip:AddLine()
-    tooltip:SetCell(row, 1, colorize(raid.name, KRaidSkipTracker.Colors.SubHeader))
-
-    tooltip:SetCell(row, 2, raid:GetSkipSummary(warbandPlayer))
-
-    for i, player in ipairs(players) do
-        if player.guid ~= "Warband" then
-            local colNum = 2 + i
-            local summary = player and raid:GetSkipSummary(player) or KRaidSkipTracker.TextIcons.RedX
-            tooltip:SetCell(row, colNum, summary)
-            if not player then
-                kprint("AddRaidRow: Found nil player at column " .. colNum .. " for raid " .. raid.name)
+        if player.isWarband then
+            display = colorize("Warband", KRaidSkipTracker.Colors.Header)
+        else
+            local classKey = player.englishClass or player.class or "(none)"
+            local color = classToColor(classKey)
+            if realm ~= "" then
+                name = name .. "\n" .. realm
             end
+            display = colorize(name, color)
         end
+
+        local columnIndex = 1 + col
+        tooltip:SetCell(header, columnIndex, display, "CENTER")
+
+        TooltipRowBuilder:AddPlayerInfoHover(tooltip, header, columnIndex, player)
     end
 end
 
+--- Adds a tooltip row for the given raid and its unlock summary.
+--- @param tooltip table # LibQTip tooltip instance
+--- @param raid table # Raid definition from RaidData
+--- @param summary table # Unlock info from RaidSummaryBuilder
+--- @param players table[] # List of snapshot structs (current, warband, alts)
+function TooltipRowBuilder:AddRaidRow(tooltip, raid, summary, players)
+    local y = tooltip:AddLine()
+    -- Column 1: Raid name
+    tooltip:SetCell(y, 1, raid.instanceShortName, "LEFT", 1)
+
+    -- Columns 2+: Unlock status icon per player
+    for colIndex, snapshot in ipairs(players) do
+        local icon = getUnlockTexture(snapshot, raid.instanceId)
+        tooltip:SetCell(y, colIndex + 1, icon, "CENTER", 1)
+    end
+end
+
+--- Attaches player info as a hover tooltip for the given cell.
+--- @param tooltip table
+--- @param row number
+--- @param column number
+--- @param player table
 function TooltipRowBuilder:AddPlayerInfoHover(tooltip, row, column, player)
     tooltip:SetCellScript(row, column, "OnEnter", function()
         local lines = {
-            L["Player:"] .. " " .. player.playerName,
-            L["Realm:"] .. " " .. player.playerRealm,
-            L["Class:"] .. " " .. (player.playerClass or L["Unknown"]),
-            L["Level:"] .. " " .. (player.playerLevel or "--"),
-            L["iLevel:"] .. " " .. (player.playerILevel and math.floor(player.playerILevel + 0.5) or "--"),
-            L["Last Synced:"] .. " " .. (player.lastUpdateServerTime and date(L["%m/%d/%y %H:%M:%S"], player.lastUpdateServerTime) or L["Unknown"]),
+            L["Player:"]       .. " " .. (player.playerName   or L["Unknown"]),
+            L["Realm:"]        .. " " .. (player.playerRealm  or L["Unknown"]),
+            L["Class:"]        .. " " .. (player.playerClass  or L["Unknown"]),
+            L["Level:"]        .. " " .. (player.playerLevel  or "--"),
+            L["iLevel:"]       .. " " .. (player.playerILevel and math.floor(player.playerILevel + 0.5) or "--"),
+            L["Last Synced:"]  .. " " .. (
+                player.lastUpdateServerTime
+                and date(L["%m/%d/%y %H:%M:%S"], player.lastUpdateServerTime)
+                or L["Unknown"]
+            ),
         }
+
         AttachHoverTooltip(tooltip, tooltip, lines)
     end)
 
@@ -107,10 +146,26 @@ function TooltipRowBuilder:AddPlayerInfoHover(tooltip, row, column, player)
     end)
 end
 
-function TooltipRowBuilder:AddFooter(tooltip)
-    tooltip:AddSeparator()
-    tooltip:SetFont(FooterFont)
-    tooltip:AddLine(colorize("Right click icon for options", KRaidSkipTracker.Colors.FooterDark))
+
+--- Inserts a visual expansion header row into the tooltip.
+--- @param tooltip table
+--- @param expansionName string
+function TooltipRowBuilder:AddExpansionBreak(tooltip, expansionName)
+    local y = tooltip:AddLine()
+    tooltip:SetCell(y, 1, colorize(expansionName, Colors.Header), "LEFT", tooltip:GetColumnCount())
 end
 
-KRaidSkipTracker.TooltipRowBuilder = TooltipRowBuilder
+--- Adds a footer line to the tooltip with instructions or extra info.
+--- @param tooltip table
+function TooltipRowBuilder:AddFooter(tooltip)
+    tooltip:SetFont(KRaidSkipTracker.Fonts.FooterText)
+
+    local msg = "Right-click icon for options"
+    local styledMsg = colorize(msg, KRaidSkipTracker.Colors.FooterDark)
+
+    tooltip:AddLine(styledMsg)
+end
+
+
+KRaidSkipTracker.UI = KRaidSkipTracker.UI or {}
+KRaidSkipTracker.UI.TooltipRowBuilder = TooltipRowBuilder

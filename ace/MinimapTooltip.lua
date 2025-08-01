@@ -13,6 +13,8 @@ local addonNameWithSpaces = Addon.Settings.AddonNameWithSpaces
 local addonIcon = Addon.Settings.IconTexture
 
 local LibQTip = LibStub("LibQTip-1.0")
+Addon.LibQTip = LibQTip
+
 local tooltip, provider
 
 ---@class ParentAceAddon : AceAddon
@@ -37,7 +39,7 @@ end
 function MinimapTooltip:ShowTooltip(anchor)
     if tooltip then tooltip:Release() end
 
-    tooltip = LibQTip:Acquire(addonTooltipName, 3, "LEFT", "LEFT")
+    tooltip = LibQTip:Acquire(addonTooltipName, 1, "LEFT")
     tooltip:SmartAnchorTo(anchor)
     tooltip:SetAutoHideDelay(0.1, anchor, function() tooltip:Release() tooltip = nil end)
 

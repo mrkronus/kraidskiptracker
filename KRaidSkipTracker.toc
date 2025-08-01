@@ -27,15 +27,20 @@ ace\AceAddon.lua
 ace\MinimapTooltip.lua
 ace\MinimapIcon.lua
 
-# KRaidSkipTracker
+# Data
+data\RaidDataHelper.lua
+data\RaidData.lua
 
-RaidData.lua
-
-modules\PlayerModel.lua
-modules\RaidModel.lua
-modules\RaidTrackerService.lua
-modules\DataMigrationService.lua
+# Modules
+modules\QuestHelper.lua
+modules\CurrentPlayerModel.lua
 modules\WarbandModel.lua
+modules\SavedPlayersStore.lua
+modules\RaidProgressScraper.lua
+modules\RaidUnlockHelper.lua
+modules\RaidSummaryBuilder.lua
 
+# UI
 ui\TooltipRowBuilder.lua
-ui\MinimapTooltipProvider.lua
+ui\TooltipRenderer.lua
+ui\TooltipProvider.lua

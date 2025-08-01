@@ -1,7 +1,7 @@
 --[[-------------------------------------------------------------------------
-    WarbandModel.lua
-    Tracks warband-wide raid skip progress.
-    Hydrates from live data only—no persistence.
+    CurrentPlayerModel.lua
+    Tracks current toon context and raid skip progress.
+    Responsible for hydration from live state and persistence via SavedPlayersStore.
 ---------------------------------------------------------------------------]]
 
 local addonName, KRaidSkipTracker = ...
@@ -10,22 +10,29 @@ local kprint = KRaidSkipTracker.kprint
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local QuestHelper = KRaidSkipTracker.Modules.QuestHelper
+local SavedPlayersStore = KRaidSkipTracker.Modules.SavedPlayersStore
+
 
 --[[-------------------------------------------------------------------------
-    WarbandModel
+    CurrentPlayerModel
 ---------------------------------------------------------------------------]]
 
-local WarbandModel = {}
+local CurrentPlayerModel = {}
 
---- Builds a structured snapshot of the warband’s metadata and progress.
+--- Builds a structured snapshot of the current toon’s metadata and progress.
 --- @return table # Snapshot containing name, realm, class, faction, progressByRaid
-function WarbandModel.BuildSnapshot()
+function CurrentPlayerModel.BuildSnapshot()
+    local name = UnitName("player") or "Unknown"
+    local realm = GetRealmName() or "Unknown"
+    local class = select(2, UnitClass("player")) or "Unknown"
+    local faction = UnitFactionGroup("player") or "Neutral"
+
     local snapshot = {
-        name = "Warband",
-        realm = GetRealmName() or "Unknown",
-        class = "Mixed",
-        faction = UnitFactionGroup("player") or "Neutral",
-        isWarband = true,
+        name = name,
+        realm = realm,
+        class = class,
+        faction = faction,
+        isWarband = false,
         progressByRaid = {}
     }
 
@@ -36,17 +43,19 @@ function WarbandModel.BuildSnapshot()
             if raid.instanceId and raid.quests then
                 local progress = {}
 
-                for _, questInfo in ipairs(raid.quests) do
+                for _, questInfo in ipairs(raid.quests or {}) do
                     local questId = questInfo.questId
                     if questId then
-                        local complete = QuestHelper.IsWarbandQuestComplete(questId)
+                        local complete = QuestHelper.IsQuestComplete(questId)
+                        local started = QuestHelper.IsInQuestLog(questId) or QuestHelper.HasStartedAnyQuestObjective(questId)
+                        local objectives = QuestHelper.GetObjectives(questId)
 
                         table.insert(progress, {
                             questId = questId,
                             questName = questInfo.questName,
                             isComplete = complete,
-                            hasStarted = nil,
-                            objectives = nil
+                            hasStarted = started,
+                            objectives = objectives
                         })
                     end
                 end
@@ -59,12 +68,18 @@ function WarbandModel.BuildSnapshot()
     return snapshot
 end
 
+--- Persists the current toon snapshot into SavedPlayersStore.
+--- @param snapshot table # Output of BuildSnapshot to persist
+--- @return boolean # True if successful, false otherwise
+function CurrentPlayerModel.PersistSnapshot(snapshot)
+    return SavedPlayersStore.Save(snapshot)
+end
 
---- Determines if the warband has started or completed any quest in the raid.
+--- Determines if the current player has started or completed any quest in the raid.
 --- @param raidId number
 --- @param snapshot table
 --- @return boolean
-function WarbandModel.IsRaidUnlocked(raidId, snapshot)
+function CurrentPlayerModel.IsRaidUnlocked(raidId, snapshot)
     if not snapshot or not snapshot.progressByRaid then return false end
     local progressList = snapshot.progressByRaid[raidId]
     if not progressList then return false end
@@ -78,6 +93,5 @@ function WarbandModel.IsRaidUnlocked(raidId, snapshot)
     return false
 end
 
-
 KRaidSkipTracker.Modules = KRaidSkipTracker.Modules or {}
-KRaidSkipTracker.Modules.WarbandModel = WarbandModel
+KRaidSkipTracker.Modules.CurrentPlayerModel = CurrentPlayerModel

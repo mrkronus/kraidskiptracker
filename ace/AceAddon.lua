@@ -113,10 +113,6 @@ function LibAceAddon:OnInitialize()
         kprint(addonNameWithSpaces.." registered with K Debug!")
     end
 
-    -- TODO: move somwhere else as this is specific to this addon
-    local WM = Addon.Models.WarbandModel
-    WM:ForceRefresh() -- or GetWarbandData() if cached
-
     self.db.profile.dataVersion = Addon.Settings.NominalVersion
 end
 

@@ -1,5 +1,6 @@
 --[[-------------------------------------------------------------------------
-	Data Initialization
+    TooltipProvider.lua
+    Integrates raid skip summary rendering into the minimap tooltip.
 ---------------------------------------------------------------------------]]
 
 local addonName, KRaidSkipTracker = ...
@@ -19,9 +20,12 @@ local ParentAceAddon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local MinimapTooltip = ParentAceAddon:GetModule("MinimapTooltip")
 local MinimapIcon = ParentAceAddon:GetModule("MinimapIcon")
 
+local RaidProgressScraper = KRaidSkipTracker.Modules.RaidProgressScraper
+local RaidSummaryBuilder = KRaidSkipTracker.Modules.RaidSummaryBuilder
+local TooltipRowBuilder = KRaidSkipTracker.UI.TooltipRowBuilder
 
 --[[-------------------------------------------------------------------------
-	Minimap Tooltip Provider
+    Minimap Tooltip Provider
 ---------------------------------------------------------------------------]]
 
 local TooltipProvider = {}
@@ -29,83 +33,65 @@ local TooltipProvider = {}
 MinimapIcon:SetClickCallback(function(...) TooltipProvider:OnIconClick(...) end)
 MinimapTooltip:SetProvider(TooltipProvider)
 
-
 --[[-------------------------------------------------------------------------
-	Event Handlers
+    Event Handlers
 ---------------------------------------------------------------------------]]
 
-function TooltipProvider:OnIconClick(clickedframe, button)
-    if button == "LeftButton" then
-         --Kollector.ItemBrowserController:Show()
-    end
-
+function TooltipProvider:OnIconClick(clickedFrame, button)
     if button == "RightButton" then
         Settings.OpenToCategory(addonName)
     end
 end
 
 --[[-------------------------------------------------------------------------
-	PopulateTooltip
+    PopulateTooltip
 ---------------------------------------------------------------------------]]
 
 function TooltipProvider:PopulateTooltip(tooltip)
-    -- Apply horizontal margin before adding data
     tooltip:SetCellMarginH(16)
     tooltip:SetCellMarginV(6)
 
-    -- Ensure Data is primed (TODO: move this somewhere else)
-    _ = KRaidSkipTracker.Models.WarbandModel:GetWarbandData()
+    local scrape = RaidProgressScraper.ScrapeProgress()
+    local raidSummaries = RaidSummaryBuilder.BuildSummaries()
+    local allExpansions = KRaidSkipTracker.questDataByExpansion
 
-    -- Ensure we have enough columns for however many players we will show
-    -- TODO: move this to a method
-    local numVisiblePlayers = #KRaidSkipTracker.VisiblePlayers
-    local warbandIncluded = false
-
-    -- Check if warband is among visible players
-    for _, player in ipairs(KRaidSkipTracker.VisiblePlayers) do
-        if player.guid == "Warband" then
-            warbandIncluded = true
-            break
-        end
+    local visiblePlayers = { scrape.warband, scrape.current }
+    for _, saved in ipairs(scrape.saved) do
+        table.insert(visiblePlayers, saved)
     end
 
-    local extraColumns = warbandIncluded and 1 or 0
-    local totalColumns = 1 + numVisiblePlayers + extraColumns -- 1 for raid name
+    local totalColumns = 1 + #visiblePlayers
 
-    local colIndex = 2  -- starting at column 2 since column 1 is raid name
-    while colIndex <= totalColumns do
+    for col = 1, totalColumns do
         tooltip:AddColumn()
-        colIndex = colIndex + 1
     end
 
-    tooltip:SetFont("KLib_MainHeaderFont")
-    local y, x = tooltip:AddLine()
+    tooltip:SetFont(KRaidSkipTracker.Fonts.MainHeader)
+    local y = tooltip:AddLine()
     tooltip:SetCell(y, 1, colorize(addonNameWithIcon, Colors.Header))
-    tooltip:SetCell(y, 2, colorize(addonVersion, Colors.Grey))
+    tooltip:SetCell(y, totalColumns-1, colorize(addonVersion, Colors.Grey), "RIGHT", 2)
 
     tooltip:AddSeparator(3, 0, 0, 0, 0)
     tooltip:AddSeparator()
     tooltip:AddSeparator(3, 0, 0, 0, 0)
 
-    local Builder       = KRaidSkipTracker.TooltipRowBuilder
-    local raids         = KRaidSkipTracker.Models.Raid:GetAll()
-    local players       = KRaidSkipTracker.VisiblePlayers
-    local warbandPlayer = KRaidSkipTracker.Models.WarbandModel:GetWarbandPlayer()
+    TooltipRowBuilder:AddHeaderRow(tooltip, visiblePlayers)
 
-    Builder:AddHeaderRow(tooltip, players)
-
-    local lastExpansion = nil
-    for _, raid in ipairs(raids) do
-        if raid.expansion ~= lastExpansion then
-            Builder:AddExpansionBreak(tooltip, raid.expansion)
-            lastExpansion = raid.expansion
+    for _, expansion in ipairs(allExpansions or {}) do
+        TooltipRowBuilder:AddExpansionBreak(tooltip, expansion.expansionName)
+        for _, raid in ipairs(expansion.raids or {}) do
+            local summary = RaidSummaryBuilder.FindSummaryForRaid(raid.instanceId, raidSummaries)
+            TooltipRowBuilder:AddRaidRow(tooltip, raid, summary, visiblePlayers)
         end
-        Builder:AddRaidRow(tooltip, raid, warbandPlayer, players)
+        tooltip:AddSeparator(2, 0, 0, 0, 0)
     end
 
     tooltip:AddSeparator(3, 0, 0, 0, 0)
     tooltip:AddSeparator()
     tooltip:AddSeparator(3, 0, 0, 0, 0)
 
-    Builder:AddFooter(tooltip)
+    TooltipRowBuilder:AddFooter(tooltip)
 end
+
+KRaidSkipTracker.UI = KRaidSkipTracker.UI or {}
+KRaidSkipTracker.UI.TooltipProvider = TooltipProvider

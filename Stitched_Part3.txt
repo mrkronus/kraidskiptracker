@@ -1,0 +1,633 @@
+
+    local scrape = RaidProgressScraper.ScrapeProgress()
+    local allExpansions = KRaidSkipTracker.questDataByExpansion
+    local summaries = {}
+
+    for _, expansion in ipairs(allExpansions or {}) do
+        for _, raid in ipairs(expansion.raids or {}) do
+            local raidId = raid.instanceId
+            local raidName = raid.instanceName
+
+            if raidId and raidName then
+                local unlockedByCurrent = false
+                local unlockedByWarband = false
+                local unlockedBySavedToon = false
+                local savedToonUnlockers = {}
+
+                if scrape.current then
+                    unlockedByCurrent = CurrentPlayerModel.IsRaidUnlocked(raidId, scrape.current)
+                end
+                if scrape.warband then
+                    unlockedByWarband = WarbandModel.IsRaidUnlocked(raidId, scrape.warband)
+                end
+                for _, saved in ipairs(scrape.saved or {}) do
+                    local entries = saved.progressByRaid and saved.progressByRaid[raidId] or {}
+
+                    for _, entry in ipairs(entries) do
+                        if entry.hasStarted or entry.isComplete then
+                            unlockedBySavedToon = true
+                            table.insert(savedToonUnlockers, saved.name .. "-" .. saved.realm)
+                            break
+                        end
+                    end
+                end
+
+                table.insert(summaries, {
+                    raidId = raidId,
+                    raidName = raidName,
+                    unlockedByCurrent = unlockedByCurrent,
+                    unlockedByWarband = unlockedByWarband,
+                    unlockedBySavedToon = unlockedBySavedToon,
+                    savedToonUnlockers = savedToonUnlockers
+                })
+            end
+        end
+    end
+
+    return summaries
+end
+
+
+--- Finds a raid summary for the given raidId from a list.
+--- @param raidId number
+--- @param summaries table[]
+--- @return table? # The matching raid summary, or nil if not found
+function RaidSummaryBuilder.FindSummaryForRaid(raidId, summaries)
+    for _, summary in ipairs(summaries or {}) do
+        if summary.raidId == raidId then
+            return summary
+        end
+    end
+    return nil
+end
+
+--- Checks if a snapshot shows the raid unlocked.
+--- @param snapshot table
+--- @param raidId string
+--- @return boolean
+local function isRaidUnlocked(snapshot, raidId)
+    local progress = snapshot.progressByRaid and snapshot.progressByRaid[raidId]
+    if not progress then return false end
+
+    for _, entry in ipairs(progress) do
+        if entry.isComplete then
+            return true
+        end
+    end
+
+    return false
+end
+
+KRaidSkipTracker.Modules = KRaidSkipTracker.Modules or {}
+KRaidSkipTracker.Modules.RaidSummaryBuilder = RaidSummaryBuilder
+
+
+
+--[[-------------------------------------------------------------------------
+    RaidUnlockHelper.lua
+    Original path: C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\KRaidSkipTracker\modules\RaidUnlockHelper.lua
+---------------------------------------------------------------------------]]
+
+--[[-------------------------------------------------------------------------
+    RaidUnlockHelper.lua
+    Placeholder for centralized raid unlock logic.
+    May be used to abstract repeated checks across summary and UI layers.
+---------------------------------------------------------------------------]]
+
+local addonName, KRaidSkipTracker = ...
+
+local kprint = KRaidSkipTracker.kprint
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
+--[[-------------------------------------------------------------------------
+    RaidUnlockHelper
+---------------------------------------------------------------------------]]
+
+local RaidUnlockHelper = {}
+
+--- Determines if a snapshot shows the raid as unlocked.
+--- NOTE: Implementation pending
+--- @param snapshot table
+--- @param raidId string
+--- @return boolean
+function RaidUnlockHelper.IsRaidUnlocked(snapshot, raidId)
+    -- TODO: Delegate logic from RaidSummaryBuilder
+    return false
+end
+
+--- Extracts unlock source label from summary.
+--- NOTE: Implementation pending
+--- @param summary table
+--- @return string # "Current", "Warband", "Saved", or "None"
+function RaidUnlockHelper.GetUnlockSource(summary)
+    -- TODO: Use summary fields to return display label
+    return "None"
+end
+
+KRaidSkipTracker.Modules = KRaidSkipTracker.Modules or {}
+KRaidSkipTracker.Modules.RaidUnlockHelper = RaidUnlockHelper
+
+
+
+--[[-------------------------------------------------------------------------
+    SavedPlayersStore.lua
+    Original path: C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\KRaidSkipTracker\modules\SavedPlayersStore.lua
+---------------------------------------------------------------------------]]
+
+--[[-------------------------------------------------------------------------
+    SavedPlayersStore.lua
+    Holds persisted toon records excluding current and warband.
+    Interface for loading, saving, and iterating saved characters.
+---------------------------------------------------------------------------]]
+
+local addonName, KRaidSkipTracker = ...
+
+local kprint = KRaidSkipTracker.kprint
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
+
+--[[-------------------------------------------------------------------------
+    SavedPlayersStore
+---------------------------------------------------------------------------]]
+
+local SavedPlayersStore = {}
+
+--- Loads all persisted toon snapshots from saved variables.
+--- @return table<string, table> # Map of toonKey → snapshot table
+function SavedPlayersStore.LoadAll()
+    if not KRaidSkipTrackerDB or not KRaidSkipTrackerDB.savedPlayers then
+        return {}
+    end
+
+    return KRaidSkipTrackerDB.savedPlayers
+end
+
+--- Saves a snapshot for a single toon into saved variables.
+--- @param snapshot table # Output from CurrentPlayerModel.BuildSnapshot
+--- @return boolean # True if save succeeded
+function SavedPlayersStore.Save(snapshot)
+    if not snapshot or type(snapshot) ~= "table" then
+        return false
+    end
+
+    local name = snapshot.name or "UNKNOWN"
+    local realm = snapshot.realm or GetRealmName() or "UNKNOWN"
+    local toonKey = name .. "-" .. realm
+
+    KRaidSkipTrackerDB.savedPlayers = KRaidSkipTrackerDB.savedPlayers or {}
+    KRaidSkipTrackerDB.savedPlayers[toonKey] = snapshot
+
+    return true
+end
+
+--- Returns an array of all persisted toon keys (for iteration).
+--- @return string[] # Array of saved toon IDs
+function SavedPlayersStore.ListKeys()
+    local all = SavedPlayersStore.LoadAll()
+    local keys = {}
+
+    for key, _ in pairs(all) do
+        table.insert(keys, key)
+    end
+
+    return keys
+end
+
+--- Retrieves a snapshot for a specific toonKey.
+--- @param toonKey string # Unique identifier like "CharName-Realm"
+--- @return table|nil # Snapshot table or nil if not found
+function SavedPlayersStore.Load(toonKey)
+    if not toonKey or type(toonKey) ~= "string" then
+        return nil
+    end
+
+    local all = SavedPlayersStore.LoadAll()
+    return all[toonKey]
+end
+
+KRaidSkipTracker.Modules = KRaidSkipTracker.Modules or {}
+KRaidSkipTracker.Modules.SavedPlayersStore = SavedPlayersStore
+
+
+
+--[[-------------------------------------------------------------------------
+    WarbandModel.lua
+    Original path: C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\KRaidSkipTracker\modules\WarbandModel.lua
+---------------------------------------------------------------------------]]
+
+--[[-------------------------------------------------------------------------
+    WarbandModel.lua
+    Tracks warband-wide raid skip progress.
+    Hydrates from live data only—no persistence.
+---------------------------------------------------------------------------]]
+
+local addonName, KRaidSkipTracker = ...
+
+local kprint = KRaidSkipTracker.kprint
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
+local QuestHelper = KRaidSkipTracker.Modules.QuestHelper
+
+--[[-------------------------------------------------------------------------
+    WarbandModel
+---------------------------------------------------------------------------]]
+
+local WarbandModel = {}
+
+--- Builds a structured snapshot of the warband’s metadata and progress.
+--- @return table # Snapshot containing name, realm, class, faction, progressByRaid
+function WarbandModel.BuildSnapshot()
+    local snapshot = {
+        name = "Warband",
+        realm = GetRealmName() or "Unknown",
+        class = "Mixed",
+        faction = UnitFactionGroup("player") or "Neutral",
+        isWarband = true,
+        progressByRaid = {}
+    }
+
+    local allExpansions = KRaidSkipTracker.questDataByExpansion
+
+    for _, expansion in ipairs(allExpansions or {}) do
+        for _, raid in ipairs(expansion.raids or {}) do
+            if raid.instanceId and raid.quests then
+                local progress = {}
+
+                for _, questInfo in ipairs(raid.quests) do
+                    local questId = questInfo.questId
+                    if questId then
+                        local complete = QuestHelper.IsWarbandQuestComplete(questId)
+
+                        table.insert(progress, {
+                            questId = questId,
+                            questName = questInfo.questName,
+                            isComplete = complete,
+                            hasStarted = nil,
+                            objectives = nil
+                        })
+                    end
+                end
+
+                snapshot.progressByRaid[raid.instanceId] = progress
+            end
+        end
+    end
+
+    return snapshot
+end
+
+
+--- Determines if the warband has started or completed any quest in the raid.
+--- @param raidId number
+--- @param snapshot table
+--- @return boolean
+function WarbandModel.IsRaidUnlocked(raidId, snapshot)
+    if not snapshot or not snapshot.progressByRaid then return false end
+    local progressList = snapshot.progressByRaid[raidId]
+    if not progressList then return false end
+
+    for _, entry in ipairs(progressList) do
+        if entry.hasStarted or entry.isComplete then
+            return true
+        end
+    end
+
+    return false
+end
+
+
+KRaidSkipTracker.Modules = KRaidSkipTracker.Modules or {}
+KRaidSkipTracker.Modules.WarbandModel = WarbandModel
+
+
+
+--[[-------------------------------------------------------------------------
+    TooltipProvider.lua
+    Original path: C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\KRaidSkipTracker\ui\TooltipProvider.lua
+---------------------------------------------------------------------------]]
+
+--[[-------------------------------------------------------------------------
+    TooltipProvider.lua
+    Integrates raid skip summary rendering into the minimap tooltip.
+---------------------------------------------------------------------------]]
+
+local addonName, KRaidSkipTracker = ...
+
+local kprint = KRaidSkipTracker.kprint
+local Colors = KRaidSkipTracker.Colors
+local Fonts = KRaidSkipTracker.Fonts
+
+local addonName = KRaidSkipTracker.Settings.AddonName
+local addonTooltipName = KRaidSkipTracker.Settings.AddonTooltipName
+local addonVersion = KRaidSkipTracker.Settings.Version
+local addonNameWithIcon = KRaidSkipTracker.Settings.AddonNameWithIcon
+
+---@class ParentAceAddon : AceAddon
+local ParentAceAddon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+
+local MinimapTooltip = ParentAceAddon:GetModule("MinimapTooltip")
+local MinimapIcon = ParentAceAddon:GetModule("MinimapIcon")
+
+local RaidProgressScraper = KRaidSkipTracker.Modules.RaidProgressScraper
+local RaidSummaryBuilder = KRaidSkipTracker.Modules.RaidSummaryBuilder
+local TooltipRowBuilder = KRaidSkipTracker.UI.TooltipRowBuilder
+
+--[[-------------------------------------------------------------------------
+    Minimap Tooltip Provider
+---------------------------------------------------------------------------]]
+
+local TooltipProvider = {}
+
+MinimapIcon:SetClickCallback(function(...) TooltipProvider:OnIconClick(...) end)
+MinimapTooltip:SetProvider(TooltipProvider)
+
+--[[-------------------------------------------------------------------------
+    Event Handlers
+---------------------------------------------------------------------------]]
+
+function TooltipProvider:OnIconClick(clickedFrame, button)
+    if button == "RightButton" then
+        Settings.OpenToCategory(addonName)
+    end
+end
+
+--[[-------------------------------------------------------------------------
+    PopulateTooltip
+---------------------------------------------------------------------------]]
+
+function TooltipProvider:PopulateTooltip(tooltip)
+    tooltip:SetCellMarginH(16)
+    tooltip:SetCellMarginV(6)
+
+    local scrape = RaidProgressScraper.ScrapeProgress()
+    local raidSummaries = RaidSummaryBuilder.BuildSummaries()
+    local allExpansions = KRaidSkipTracker.questDataByExpansion
+
+    local visiblePlayers = { scrape.warband, scrape.current }
+    for _, saved in ipairs(scrape.saved) do
+        table.insert(visiblePlayers, saved)
+    end
+
+    local totalColumns = 1 + #visiblePlayers
+
+    for col = 1, totalColumns do
+        tooltip:AddColumn()
+    end
+
+    tooltip:SetFont(KRaidSkipTracker.Fonts.MainHeader)
+    local y = tooltip:AddLine()
+    tooltip:SetCell(y, 1, colorize(addonNameWithIcon, Colors.Header))
+    tooltip:SetCell(y, totalColumns-1, colorize(addonVersion, Colors.Grey), "RIGHT", 2)
+
+    tooltip:AddSeparator(3, 0, 0, 0, 0)
+    tooltip:AddSeparator()
+    tooltip:AddSeparator(3, 0, 0, 0, 0)
+
+    TooltipRowBuilder:AddHeaderRow(tooltip, visiblePlayers)
+
+    for _, expansion in ipairs(allExpansions or {}) do
+        TooltipRowBuilder:AddExpansionBreak(tooltip, expansion.expansionName)
+        for _, raid in ipairs(expansion.raids or {}) do
+            local summary = RaidSummaryBuilder.FindSummaryForRaid(raid.instanceId, raidSummaries)
+            TooltipRowBuilder:AddRaidRow(tooltip, raid, summary, visiblePlayers)
+        end
+        tooltip:AddSeparator(2, 0, 0, 0, 0)
+    end
+
+    tooltip:AddSeparator(3, 0, 0, 0, 0)
+    tooltip:AddSeparator()
+    tooltip:AddSeparator(3, 0, 0, 0, 0)
+
+    TooltipRowBuilder:AddFooter(tooltip)
+end
+
+KRaidSkipTracker.UI = KRaidSkipTracker.UI or {}
+KRaidSkipTracker.UI.TooltipProvider = TooltipProvider
+
+
+
+--[[-------------------------------------------------------------------------
+    TooltipRenderer.lua
+    Original path: C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\KRaidSkipTracker\ui\TooltipRenderer.lua
+---------------------------------------------------------------------------]]
+
+--[[-------------------------------------------------------------------------
+    TooltipRenderer.lua
+    Creates and populates GameTooltip with raid unlock summaries.
+---------------------------------------------------------------------------]]
+
+local addonName, KRaidSkipTracker = ...
+
+local kprint = KRaidSkipTracker.kprint
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
+local RaidSummaryBuilder = KRaidSkipTracker.Modules.RaidSummaryBuilder
+local TooltipRowRenderer = KRaidSkipTracker.UI.TooltipRowBuilder
+
+--[[-------------------------------------------------------------------------
+    TooltipRenderer
+---------------------------------------------------------------------------]]
+
+local TooltipRenderer = {}
+KRaidSkipTracker.UI.TooltipRenderer = TooltipRenderer
+
+--- Renders the tooltip at the given anchor.
+--- @param anchorFrame table
+function TooltipRenderer.Render(anchorFrame)
+    GameTooltip:SetOwner(anchorFrame, "ANCHOR_RIGHT")
+    GameTooltip:ClearLines()
+
+    GameTooltip:AddLine(L["RAID_SKIP_SUMMARY"], 1, 1, 1, true)
+
+    local summaries = RaidSummaryBuilder.BuildSummaries()
+    for _, summary in ipairs(summaries) do
+        TooltipRowRenderer.RenderRaidRow(summary)
+    end
+
+    GameTooltip:Show()
+end
+
+KRaidSkipTracker.UI = KRaidSkipTracker.UI or {}
+KRaidSkipTracker.UI.TooltipRenderer = TooltipRenderer
+
+
+
+--[[-------------------------------------------------------------------------
+    TooltipRowBuilder.lua
+    Original path: C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\KRaidSkipTracker\ui\TooltipRowBuilder.lua
+---------------------------------------------------------------------------]]
+
+--[[-------------------------------------------------------------------------
+    TooltipRowBuilder.lua
+    Composes tooltip rows for raid skip summary using inline textures.
+---------------------------------------------------------------------------]]
+
+local addonName, KRaidSkipTracker = ...
+local kprint = KRaidSkipTracker.kprint
+
+local L = LibStub("AceLocale-3.0"):GetLocale(KRaidSkipTracker.Settings.AddonName)
+
+
+local Colors = KRaidSkipTracker.Colors
+
+
+--[[-------------------------------------------------------------------------
+    Helpers
+---------------------------------------------------------------------------]]
+
+--- Attaches a hover tooltip with the given lines to the specified anchor cell.
+--- @param parentTooltip table
+--- @param anchorCell table
+--- @param lines string[]
+function AttachHoverTooltip(parentTooltip, anchorCell, lines)
+    local hover = KRaidSkipTracker.LibQTip:Acquire("KRaidHoverTooltip", 1, "LEFT")
+    parentTooltip.tooltip = hover
+
+    hover:SetFont(KRaidSkipTracker.Fonts.MainText)
+    for _, line in ipairs(lines) do
+        local styled = colorize(line, KRaidSkipTracker.Colors.White)
+        hover:AddLine(styled, "LEFT", KRaidSkipTracker.Colors.White)
+    end
+
+    hover:SmartAnchorTo(anchorCell)
+    hover:SetAutoHideDelay(0.01, parentTooltip)
+    hover:Show()
+end
+
+--- Returns texture string representing unlock status.
+--- @param snapshot table
+--- @param raidId number
+--- @return string # Texture tag (|T...|t)
+local function getUnlockTexture(snapshot, raidId)
+    local id = tonumber(raidId)
+    local progress = snapshot.progressByRaid and snapshot.progressByRaid[id]
+
+    if not progress then
+        return "|TInterface\\Common\\Indicator-Gray:16:16|t"  -- Unknown / no data
+    end
+
+    for _, entry in ipairs(progress) do
+        if entry.isComplete then
+            return "|TInterface\\RaidFrame\\ReadyCheck-Ready:16:16|t"  -- Completed
+        end
+        if entry.hasStarted then
+            return "|TInterface\\RaidFrame\\ReadyCheck-Waiting:16:16|t" -- Started
+        end
+    end
+
+    return "|TInterface\\RaidFrame\\ReadyCheck-NotReady:16:16|t" -- Not started
+end
+
+
+--[[-------------------------------------------------------------------------
+    TooltipRowBuilder
+---------------------------------------------------------------------------]]
+
+local TooltipRowBuilder = {}
+
+--- Adds a formatted header row to the tooltip based on the list of players.
+-- Each cell displays the player's name and optionally their realm, with class-based coloring.
+-- Warband entries are styled separately.
+-- @param tooltip The tooltip object being populated
+-- @param players A list of player data structs to render in header columns
+function TooltipRowBuilder:AddHeaderRow(tooltip, players)
+    tooltip:SetFont(KRaidSkipTracker.Fonts.Heading)
+    local header = tooltip:AddLine()
+
+    for col, player in ipairs(players) do
+        local name = player.name or player.displayName or "?"
+        local realm = player.realm or ""
+        local display
+
+        if player.isWarband then
+            display = colorize("Warband", KRaidSkipTracker.Colors.Header)
+        else
+            local classKey = player.englishClass or player.class or "(none)"
+            local color = classToColor(classKey)
+            if realm ~= "" then
+                name = name .. "\n" .. realm
+            end
+            display = colorize(name, color)
+        end
+
+        local columnIndex = 1 + col
+        tooltip:SetCell(header, columnIndex, display, "CENTER")
+
+        TooltipRowBuilder:AddPlayerInfoHover(tooltip, header, columnIndex, player)
+    end
+end
+
+--- Adds a tooltip row for the given raid and its unlock summary.
+--- @param tooltip table # LibQTip tooltip instance
+--- @param raid table # Raid definition from RaidData
+--- @param summary table # Unlock info from RaidSummaryBuilder
+--- @param players table[] # List of snapshot structs (current, warband, alts)
+function TooltipRowBuilder:AddRaidRow(tooltip, raid, summary, players)
+    local y = tooltip:AddLine()
+    -- Column 1: Raid name
+    tooltip:SetCell(y, 1, raid.instanceShortName, "LEFT", 1)
+
+    -- Columns 2+: Unlock status icon per player
+    for colIndex, snapshot in ipairs(players) do
+        local icon = getUnlockTexture(snapshot, raid.instanceId)
+        tooltip:SetCell(y, colIndex + 1, icon, "CENTER", 1)
+    end
+end
+
+--- Attaches player info as a hover tooltip for the given cell.
+--- @param tooltip table
+--- @param row number
+--- @param column number
+--- @param player table
+function TooltipRowBuilder:AddPlayerInfoHover(tooltip, row, column, player)
+    tooltip:SetCellScript(row, column, "OnEnter", function()
+        local lines = {
+            L["Player:"]       .. " " .. (player.playerName   or L["Unknown"]),
+            L["Realm:"]        .. " " .. (player.playerRealm  or L["Unknown"]),
+            L["Class:"]        .. " " .. (player.playerClass  or L["Unknown"]),
+            L["Level:"]        .. " " .. (player.playerLevel  or "--"),
+            L["iLevel:"]       .. " " .. (player.playerILevel and math.floor(player.playerILevel + 0.5) or "--"),
+            L["Last Synced:"]  .. " " .. (
+                player.lastUpdateServerTime
+                and date(L["%m/%d/%y %H:%M:%S"], player.lastUpdateServerTime)
+                or L["Unknown"]
+            ),
+        }
+
+        AttachHoverTooltip(tooltip, tooltip, lines)
+    end)
+
+    tooltip:SetCellScript(row, column, "OnLeave", function()
+        if tooltip.tooltip then
+            tooltip.tooltip:Release()
+            tooltip.tooltip = nil
+        end
+    end)
+end
+
+
+--- Inserts a visual expansion header row into the tooltip.
+--- @param tooltip table
+--- @param expansionName string
+function TooltipRowBuilder:AddExpansionBreak(tooltip, expansionName)
+    local y = tooltip:AddLine()
+    tooltip:SetCell(y, 1, colorize(expansionName, Colors.Header), "LEFT", tooltip:GetColumnCount())
+end
+
+--- Adds a footer line to the tooltip with instructions or extra info.
+--- @param tooltip table
+function TooltipRowBuilder:AddFooter(tooltip)
+    tooltip:SetFont(KRaidSkipTracker.Fonts.FooterText)
+
+    local msg = "Right-click icon for options"
+    local styledMsg = colorize(msg, KRaidSkipTracker.Colors.FooterDark)
+
+    tooltip:AddLine(styledMsg)
+end
+
+
+KRaidSkipTracker.UI = KRaidSkipTracker.UI or {}
+KRaidSkipTracker.UI.TooltipRowBuilder = TooltipRowBuilder
+
+
+

@@ -8,6 +8,10 @@ local Addon = select(2, ...)
 local KLib = _G.KLib or nil
 local KDebug = _G.KDebug or nil
 
+-- TODO: Move
+Addon.Modules = {}
+Addon.UI = {}
+
 Addon.Settings = {}
 Addon.Settings.HasKDebug = (KLib and KLib.HasKDebug and KDebug) or false
 Addon.Settings.kprint = (KLib and KLib.kprint) or function() end
