@@ -1,15 +1,15 @@
 ## Interface: 110100, 110105, 110107
 ## Title: KRaidSkipTracker
-## X-Title-With-Spaces: K Raid Skip Tracker
 ## IconTexture: Interface\Icons\inv_misc_key_15
 ## SavedVariables: KRaidSkipTrackerDB
 
 ## Notes: KRaidSkipTracker
 ## Author: Kronus and Katatonik_Kat
-## Version: 11.1.7.25
+## Version: 11.1.7.24
 ## X-Release-Type: beta
 ## Dependencies: 
 ## LoadOnDemand: 0
+## X-Nominal-Version: 24
 ## X-Curse-Project-ID: 978841
 
 ## OptionalDeps: Ace3
@@ -20,27 +20,8 @@ Embeds.xml
 Locale.xml
 #@end-no-lib-strip@
 
-libs\KLibLite.lua
-AddonSettings.lua
-
-ace\AceAddon.lua
-ace\MinimapTooltip.lua
-ace\MinimapIcon.lua
-
-# Data
-data\RaidDataHelper.lua
-data\RaidData.lua
-
-# Modules
-modules\QuestHelper.lua
-modules\CurrentPlayerModel.lua
-modules\WarbandModel.lua
-modules\SavedPlayersStore.lua
-modules\RaidProgressScraper.lua
-modules\RaidUnlockHelper.lua
-modules\RaidSummaryBuilder.lua
-
-# UI
-ui\TooltipRowBuilder.lua
-ui\TooltipRenderer.lua
-ui\TooltipProvider.lua
+# KRaidSkipTracker
+RaidData.lua
+Helpers.lua
+KRaidSkipTracker.lua
+Main.lua
